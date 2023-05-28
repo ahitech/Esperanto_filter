@@ -192,6 +192,8 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
 				outList->AddItem(pmBackSpace);
 				
+				
+				/* Test */
 
 				switch (cPreviousKey) {
 					case 'C':
