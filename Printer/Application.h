@@ -17,6 +17,8 @@ class AppView : public BTextView
 		void KeyDown(const char *bytes, int32 numBytes);
 		void AttachedToWindow();
 		
+		void SaveMessage(BMessage* msg, const char* fileName);
+		
 };
 
 class AppWindow : public BWindow

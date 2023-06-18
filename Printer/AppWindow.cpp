@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <stdio.h>
+#include <File.h>
 #include <Font.h>
 #include <Rect.h>
 #include <String.h>
@@ -46,15 +47,31 @@ void AppView::AddText (const char* text, int32 numBytes = 0)
 }
 
 
+
+void AppView::SaveMessage(BMessage* msg, const char* fileName)
+{
+	if (!msg || !fileName) return;
+	BFile* toSave = new BFile(fileName, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (toSave->InitCheck() == B_OK)
+	{
+		msg->Flatten(toSave, 0);
+		toSave->Unset();
+		AddText ("Message saved!");
+	}
+	delete toSave;
+}
+
+
 void AppView::KeyDown(const char *bytes, int32 numBytes)
 {
-	BMessage *msg;
+	BMessage *msg = Window()->CurrentMessage();
+	BString filePath;
+	BFile* toSave;
 	if (numBytes == 1)
 	{
 		switch (bytes[0])
 		{
 			case B_FUNCTION_KEY:
-				msg = Window()->CurrentMessage();
 				if ( msg ) {
 					int32 key;
 					char c[100];
@@ -114,6 +131,9 @@ void AppView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 			case B_BACKSPACE:
 				AddText ("Backspace");
+				
+				SaveMessage(msg, "Backspace.msg");
+				
 				break;
 			case B_ENTER:
 				AddText ("Enter key");
@@ -165,6 +185,45 @@ void AppView::KeyDown(const char *bytes, int32 numBytes)
 	{
 		if (numBytes > 0) {
 			AddText (bytes, numBytes);
+			
+			BString receivedValue(bytes);
+			if 		(receivedValue.Compare("Ĉ") == 0) {
+				SaveMessage(msg, "Ĉ.msg");
+			}
+			else if (receivedValue.Compare("ĉ") == 0) {
+				SaveMessage(msg, "ĉ.msg");
+			}
+			else if (receivedValue.Compare("Ŝ") == 0) {
+				SaveMessage(msg, "Ŝ.msg");
+			}
+			else if (receivedValue.Compare("ŝ") == 0) {
+				SaveMessage(msg, "ŝ.msg");
+			}
+			else if (receivedValue.Compare("Ĵ") == 0) {
+				SaveMessage(msg, "Ĵ.msg");
+			}
+			else if (receivedValue.Compare("ĵ") == 0) {
+				SaveMessage(msg, "ĵ.msg");
+			}
+			else if (receivedValue.Compare("Ĥ") == 0) {
+				SaveMessage(msg, "Ĥ.msg");
+			}
+			else if (receivedValue.Compare("ĥ") == 0) {
+				SaveMessage(msg, "ĥ.msg");
+			}
+			else if (receivedValue.Compare("Ĝ") == 0) {
+				SaveMessage(msg, "Ĝ.msg");
+			}
+			else if (receivedValue.Compare("ĝ") == 0) {
+				SaveMessage(msg, "ĝ.msg");
+			}
+			else if (receivedValue.Compare("Ŭ") == 0) {
+				SaveMessage(msg, "Ŭ.msg");
+			}
+			else if (receivedValue.Compare("ŭ") == 0) {
+				SaveMessage(msg, "ŭ.msg");
+			}
+			
 		}
 	}
 }
