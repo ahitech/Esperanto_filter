@@ -129,7 +129,9 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 {
 	static bool	bExpectingThePostfix = false;
 	static char cPreviousKey = '0';
+	BFile *messageToSend = NULL;
 	
+	FILE* log = fopen ("/boot/home/Log.txt", "a");
 	
 	const char* bytes;
 	if (in->FindString("bytes", &bytes) != B_OK)
@@ -163,7 +165,11 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				break;
 			case '^':
 			{
+				fprintf (log, "Detected caret ^\n");
+				
 				if (cPreviousKey == '0') {
+					fprintf(log, "The previous letter was not one of the interesting ones.\n");
+					
 					break;
 				}
 				BMessage *pmBackSpace = new BMessage(*in), 
@@ -180,17 +186,31 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				
 				
 */				
-				BFile *writeTo = new BFile("/boot/home/EsperantoFilter-Bakspase.msg", 	// Try opening the file
+
+				fprintf(log, "Trying to send the backspace\n");
+
+				messageToSend = new BFile("/boot/home/Projects/Esperanto_filter/Backspace.msg", 	// Try opening the file
 							   B_READ_ONLY);
-				if ((writeTo->InitCheck()) == B_OK)
+				if ((messageToSend->InitCheck()) == B_OK)
 				{
-					pmBackSpace->Unflatten(writeTo);	// Perform actual read
-					writeTo->Unset();					// Flush and close the file
-					delete writeTo;
+					fprintf(log, "Opened the file successfully!\n");
+					if (pmBackSpace->Unflatten(messageToSend) == B_OK)	// Perform actual read
+					{
+						fprintf(log, "Read the backspace message!\n");
+						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
+						outList->AddItem(pmBackSpace);
+						fprintf(log, "Added backspace to the output list!\n");
+						messageToSend->Unset();					// Flush and close the file
+						delete messageToSend;
+						messageToSend = NULL;
+					}
+					else {
+						fprintf(log, "Did not succeed to unflatten the backspace!\n");
+					}
+				} else {
+					fprintf(log, "Did not succeed to open the file with backspace!\n");		
 				}
 				
-				pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
-				outList->AddItem(pmBackSpace);
 				
 				
 				/* Test */
@@ -200,12 +220,30 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					{
 						cPreviousKey = '0';
 						
-						pmNewCharacter->ReplaceInt32("key", 0x4E);
-						pmNewCharacter->ReplaceString("bytes", "Ĉ");
-						pmNewCharacter->RemoveName("byte");
-						pmNewCharacter->AddInt8("byte", 0xC4);
-						pmNewCharacter->AddInt8("byte", 0x88);
-						pmNewCharacter->ReplaceInt32("raw_char", ('Ĉ' & 0x7f));
+						fprintf(log, "The previous letter was C\n");
+						
+						messageToSend = new BFile("/boot/home/Projects/Esperanto_filter/C-circumflex.msg", 	// Try opening the file
+							   B_READ_ONLY);
+						if ((messageToSend->InitCheck()) == B_OK)
+						{
+							fprintf(log, "Opened the file with C-circumflex successfully!\n");
+							if (B_OK == pmNewCharacter->Unflatten(messageToSend))	// Perform actual read
+							{
+								fprintf(log, "Read the message with C-circumflex successfully!\n");
+								pmNewCharacter->ReplaceInt64("when", real_time_clock_usecs());
+								outList->AddItem(pmNewCharacter);
+								fprintf(log, "Added the C-circumflex successfully!\n");
+								messageToSend->Unset();					// Flush and close the file
+								delete messageToSend;
+								messageToSend = NULL;
+							} else {
+								fprintf(log, "Did not succeed to unflatten the C-circumflex message!\n");
+							}
+						} else {
+							fprintf(log, "Did not succeed to open the C-circumflex file!\n");
+						}
+				
+						
 						break;
 					}
 					default:
@@ -213,15 +251,9 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 						break;			
 				};	// <-- end of "switch (previous key)"
 				
-				writeTo = new BFile("/boot/home/DEBUGGING_SECOND_MESSAGE.msg", 	// Try opening the file
-							   B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-				if ((writeTo->InitCheck()) == B_OK)
-				{
-					pmNewCharacter->Flatten (writeTo);	// Perform actual write
-					writeTo->Unset();					// Flush and close the file
-					delete writeTo;
-				}
-				outList->AddItem(pmNewCharacter);
+				fprintf(log, "Before exiting the filter: outList has %d messages.\n", outList->CountItems());
+
+				
 				break;
 			}
 			default:
@@ -249,6 +281,8 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 			}
 */
 	}	// <-- end of "if (a key was pressed)"
+	
+	fclose(log);
 	return B_DISPATCH_MESSAGE;
 }
 
