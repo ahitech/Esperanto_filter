@@ -6,6 +6,7 @@
 #include <String.h>
 #include <Window.h>
 
+#include <map>
 #include <stdio.h>
 
 #define		PATH_TO_BIG_SEE_FILE	\
@@ -17,6 +18,7 @@
 
 #define		POSTFIX_KEYS_NAME	"Postfix keys"
 
+#define		TRACE(text)		{ FILE* logA = fopen("/boot/home/Log.txt", "a"); if (logA) { fprintf(logA, text); fflush(logA); fclose(logA); } }
 
 class EsperantoInputFilter : public BInputServerFilter
 {
@@ -31,10 +33,14 @@ protected:
 	virtual status_t		GetSettings(void);
 	virtual status_t		CheckSettings(void);
 	
+	virtual status_t		LoadMessage(const char* , BMessage*);
+	virtual status_t		PopulateMap(void);
+	
 	bool					fInitScrolling;
 	BPoint					fCurrentMousePosition;
 	BMessage*				fSettings;
 
+	std::map<char, BMessage* > mMessagesMap;	
 };
 
 
@@ -110,6 +116,8 @@ status_t	EsperantoInputFilter::CheckSettings(void)
 EsperantoInputFilter::EsperantoInputFilter()
 {
 	this->fSettings = new BMessage (SETTINGS_MESSAGE_CONSTANT);
+	
+	this->mMessagesMap.clear();
 //	GetSettings();
 
 }
@@ -118,6 +126,155 @@ EsperantoInputFilter::~EsperantoInputFilter()
 {
 
 }
+
+/**
+ *	\brief		Load message into one of the parameters
+ *	\param	path[IN]	Path to the file with flattened message
+ *	\param	out[OUT]	Pointer to the unflattened message
+ *	\return		B_OK	If succeeded to unflatten the message
+ *				B_NO_INIT	If the input parameter is NULL
+ *				Other		In case of other errors
+ *	\note		Caller is responsible for clearing the allocated memory!
+ */
+status_t EsperantoInputFilter::LoadMessage( const char* path,
+											BMessage* out)
+{
+	status_t toReturn = B_OK;
+	if (!out) { return B_NO_INIT; }
+	
+	TRACE(path);
+	BFile* flattenedMessage = new BFile(path, 	// Try opening the file
+							      B_READ_ONLY);
+	toReturn = flattenedMessage->InitCheck();
+	if (toReturn == B_OK) 
+	{
+		TRACE("Opened the file with flattened message successfully!\n");
+		toReturn = out->Unflatten(flattenedMessage);		// Perform actual read
+		if (B_OK == toReturn) {
+			TRACE("Unflattened the message from disk successfully!\n");
+		} else {
+			TRACE("Did not succeed to unflatten the message from disk!\n");
+		}
+	} else {
+		TRACE("Did not succeed to open the message file!\n");
+	}
+	
+	return toReturn;
+}
+
+status_t EsperantoInputFilter::PopulateMap (void)
+{
+	status_t toReturn = B_OK;
+	
+	BMessage* msg = new BMessage();
+	
+	// ĉ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĉ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'ĉ', msg});
+		}
+	}
+	
+	// Ĉ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĉ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'Ĉ', msg});
+		}
+	}
+
+	// ĝ	
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĝ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'ĝ', msg});
+		}
+	}
+	
+	// Ĝ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĝ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'Ĝ', msg});
+		}
+	}
+	
+	// ĥ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĥ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'ĥ', msg});
+		}
+	}
+	
+	// Ĥ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĥ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'Ĥ', msg});
+		}
+	}
+		
+	// ĵ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĵ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'ĵ', msg});
+		}
+	}
+	
+	// Ĵ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĵ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'Ĵ', msg});
+		}
+	}
+	
+	// ŝ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ŝ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'ŝ', msg});
+		}
+	}
+	
+	// Ŝ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ŝ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'Ŝ', msg});
+		}
+	}
+	
+	// ŭ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ŭ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'ŭ', msg});
+		}
+	}
+	
+	// Ŭ
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ŭ.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'Ŭ', msg});
+		}
+	}
+	
+	// Backspace
+	if (toReturn == B_OK) {
+		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Backspace.msg", msg);
+		if (toReturn == B_OK) {
+			this->mMessagesMap.insert({'B', msg});
+		}
+	}
+
+	return toReturn;
+}
+
 
 status_t EsperantoInputFilter::InitCheck()
 {
@@ -130,8 +287,6 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 	static bool	bExpectingThePostfix = false;
 	static char cPreviousKey = '0';
 	BFile *messageToSend = NULL;
-	
-	FILE* log = fopen ("/boot/home/Log.txt", "a");
 	
 	const char* bytes;
 	if (in->FindString("bytes", &bytes) != B_OK)
@@ -165,10 +320,10 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				break;
 			case '^':
 			{
-				fprintf (log, "Detected caret ^\n");
+				TRACE("Detected caret ^\n");
 				
 				if (cPreviousKey == '0') {
-					fprintf(log, "The previous letter was not one of the interesting ones.\n");
+					TRACE("The previous letter was not one of the interesting ones.\n");
 					
 					break;
 				}
@@ -187,28 +342,28 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				
 */				
 
-				fprintf(log, "Trying to send the backspace\n");
+				TRACE("Trying to send the backspace\n");
 
-				messageToSend = new BFile("/boot/home/Projects/Esperanto_filter/Backspace.msg", 	// Try opening the file
+				BFile* messageToSend = new BFile("/boot/home/Projects/Esperanto_filter/Backspace.msg", 	// Try opening the file
 							   B_READ_ONLY);
 				if ((messageToSend->InitCheck()) == B_OK)
 				{
-					fprintf(log, "Opened the file successfully!\n");
+					TRACE("Opened the file successfully!\n");
 					if (pmBackSpace->Unflatten(messageToSend) == B_OK)	// Perform actual read
 					{
-						fprintf(log, "Read the backspace message!\n");
+						TRACE("Read the backspace message!\n");
 						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
 						outList->AddItem(pmBackSpace);
-						fprintf(log, "Added backspace to the output list!\n");
+						TRACE("Added backspace to the output list!\n");
 						messageToSend->Unset();					// Flush and close the file
 						delete messageToSend;
 						messageToSend = NULL;
 					}
 					else {
-						fprintf(log, "Did not succeed to unflatten the backspace!\n");
+						TRACE("Did not succeed to unflatten the backspace!\n");
 					}
 				} else {
-					fprintf(log, "Did not succeed to open the file with backspace!\n");		
+					TRACE("Did not succeed to open the file with backspace!\n");		
 				}
 				
 				
@@ -220,28 +375,9 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					{
 						cPreviousKey = '0';
 						
-						fprintf(log, "The previous letter was C\n");
+						TRACE("The previous letter was C\n");
 						
-						messageToSend = new BFile("/boot/home/Projects/Esperanto_filter/C-circumflex.msg", 	// Try opening the file
-							   B_READ_ONLY);
-						if ((messageToSend->InitCheck()) == B_OK)
-						{
-							fprintf(log, "Opened the file with C-circumflex successfully!\n");
-							if (B_OK == pmNewCharacter->Unflatten(messageToSend))	// Perform actual read
-							{
-								fprintf(log, "Read the message with C-circumflex successfully!\n");
-								pmNewCharacter->ReplaceInt64("when", real_time_clock_usecs());
-								outList->AddItem(pmNewCharacter);
-								fprintf(log, "Added the C-circumflex successfully!\n");
-								messageToSend->Unset();					// Flush and close the file
-								delete messageToSend;
-								messageToSend = NULL;
-							} else {
-								fprintf(log, "Did not succeed to unflatten the C-circumflex message!\n");
-							}
-						} else {
-							fprintf(log, "Did not succeed to open the C-circumflex file!\n");
-						}
+						
 				
 						
 						break;
@@ -251,7 +387,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 						break;			
 				};	// <-- end of "switch (previous key)"
 				
-				fprintf(log, "Before exiting the filter: outList has %d messages.\n", outList->CountItems());
+				TRACE("Before exiting the filter: outList has N messages.\n");
 
 				
 				break;
@@ -282,7 +418,6 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 */
 	}	// <-- end of "if (a key was pressed)"
 	
-	fclose(log);
 	return B_DISPATCH_MESSAGE;
 }
 
