@@ -129,20 +129,24 @@ EsperantoInputFilter::~EsperantoInputFilter()
 
 /**
  *	\brief		Load message into one of the parameters
- *	\param	path[IN]	Path to the file with flattened message
- *	\param	out[OUT]	Pointer to the unflattened message
+ *	\param	resourceName[IN]	Name of the resource to load
+ *	\param	out[OUT]			Pointer to the unflattened message
  *	\return		B_OK	If succeeded to unflatten the message
  *				B_NO_INIT	If the input parameter is NULL
  *				Other		In case of other errors
  *	\note		Caller is responsible for clearing the allocated memory!
  */
-status_t EsperantoInputFilter::LoadMessage( const char* path,
+status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
 											BMessage* out)
 {
 	status_t toReturn = B_OK;
 	if (!out) { return B_NO_INIT; }
 	
-	TRACE(path);
+	TRACE(resourceName);
+	
+	BFile file("/boot/home/SomeFile", B_READ_ONLY);
+	
+	
 	BFile* flattenedMessage = new BFile(path, 	// Try opening the file
 							      B_READ_ONLY);
 	toReturn = flattenedMessage->InitCheck();
@@ -170,7 +174,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// ĉ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĉ.msg", msg);
+		toReturn = this->LoadMessage("lowercaseC", msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ĉ', msg});
 		}

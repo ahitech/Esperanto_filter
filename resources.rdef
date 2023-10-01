@@ -1,0 +1,14 @@
+resource(1,"Backspace") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Backspace.msg");
+resource(2,"lowercaseC") message("/boot/home/Projects/Esperanto filter/Esperanto filter/ĉ.msg");
+resource(3,"uppercaseC") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Ĉ.msg");
+resource(4,"lowercaseG") message("/boot/home/Projects/Esperanto filter/Esperanto filter/ĝ.msg");
+resource(5,"uppercaseG") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Ĝ.msg");
+resource(6,"lowercaseH") message("/boot/home/Projects/Esperanto filter/Esperanto filter/ĥ.msg");
+resource(7,"uppercaseH") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Ĥ.msg");
+resource(8,"lowercaseJ") message("/boot/home/Projects/Esperanto filter/Esperanto filter/ĵ.msg");
+resource(9,"uppercaseJ") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Ĵ.msg");
+resource(10,"lowercaseS") message("/boot/home/Projects/Esperanto filter/Esperanto filter/ŝ.msg");
+resource(11,"uppercaseS") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Ŝ.msg");
+resource(12,"lowercaseU") message("/boot/home/Projects/Esperanto filter/Esperanto filter/ŭ.msg");
+resource(13,"uppercaseU") message("/boot/home/Projects/Esperanto filter/Esperanto filter/Ŭ.msg");
+
