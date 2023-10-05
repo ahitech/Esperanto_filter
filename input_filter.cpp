@@ -3,6 +3,7 @@
 #include <InputServerFilter.h>
 #include <Message.h>
 #include <Messenger.h>
+#include <Path.h>
 #include <String.h>
 #include <Window.h>
 
@@ -33,7 +34,8 @@ protected:
 	virtual status_t		GetSettings(void);
 	virtual status_t		CheckSettings(void);
 	
-	virtual status_t		LoadMessage(const char* , BMessage*);
+	virtual BResource* 		FindLibraryFile(void);
+	virtual status_t		LoadMessage(const char* , const BResources*, BMessage*);
 	virtual status_t		PopulateMap(void);
 	
 	bool					fInitScrolling;
@@ -127,54 +129,133 @@ EsperantoInputFilter::~EsperantoInputFilter()
 
 }
 
+
+/**
+ *	\brief		This function returns the pointer to the resource file of this compiled library.
+ *	\detais		It passes over add-on directories one-by-one and tests each of them for the
+ *				presence of this input_server filter. If this library is found, it is opened as
+ *				a BFile entity, resources are initialized, and this BResoucres object is returned
+ *				to the caller. If not, NULL is returned.
+ *	\returns	Pointer to BResources file of the library, if it is found.
+ *				NULL otherwise.
+ *	\note		The caller is responsible for closing the BResources and freeing the used memory!
+ */
+BResource* EsperantoInputFilter::FindLibraryFile(void)
+{
+	BFile toReturnFile();
+	BResources *toReturnRes = NULL;
+	BPath pathToCheck;
+	
+	status_t result = B_ENTRY_NOT_FOUND;
+	
+	// First - check the Haiku add-ons directory
+	status = find_directory(B_SYSTEM_ADDONS_DIRECTORY, &pathToCheck);
+	
+	if (status != B_OK) {
+		pathToCheck.Append("input_server/filters/EsperantoFilter");
+		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	}
+	
+	// Second - check the Haiku non-packaged add-ons directory
+	status = find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &pathToCheck);
+	
+	if (status != B_OK) {
+		pathToCheck.Append("input_server/filters/EsperantoFilter");
+		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	}
+	
+	// Third - check the user's add-ons directory
+	status = find_directory(B_USER_ADDONS_DIRECTORY, &pathToCheck);
+	
+	if (status != B_OK) {
+		pathToCheck.Append("input_server/filters/EsperantoFilter");
+		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	}
+	
+	// Fourth - check the user's non-packaged add-ons directory
+	status = find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &pathToCheck);
+	
+	if (status != B_OK) {
+		pathToCheck.Append("input_server/filters/EsperantoFilter");
+		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	}
+	
+	// It's really strange that we arrived here, since this code has to be
+	// executed somehow, but the library can't be found anywhere. Well, let's report
+	// an error.
+	if (status != B_OK) {
+		return (NULL);
+	}
+	
+	// File of the library is found. Let's check its resources:
+	status = toReturnRes->SetTo(&toReturnFile);
+	if (status != B_OK) {
+		return NULL;
+	}
+	return toReturnRes;
+}
+
+
+
 /**
  *	\brief		Load message into one of the parameters
  *	\param	resourceName[IN]	Name of the resource to load
+ *	\param	pLibraryFile[IN]	Pointer to the resources file
  *	\param	out[OUT]			Pointer to the unflattened message
  *	\return		B_OK	If succeeded to unflatten the message
- *				B_NO_INIT	If the input parameter is NULL
- *				Other		In case of other errors
+ *				B_NO_INIT	If one of the input parameters are NULL
+ *				B_NAME_NOT_FOUND	If the specified message was not found
  *	\note		Caller is responsible for clearing the allocated memory!
  */
 status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
+											BResources* pLibraryFile,
 											BMessage* out)
 {
 	status_t toReturn = B_OK;
-	if (!out) { return B_NO_INIT; }
+	size_t	outSize = 0;
+	if (!out || !pLibraryFile) { return B_NO_INIT; }
 	
 	TRACE(resourceName);
 	
-	BFile file("/boot/home/SomeFile", B_READ_ONLY);
-	
-	
-	BFile* flattenedMessage = new BFile(path, 	// Try opening the file
-							      B_READ_ONLY);
-	toReturn = flattenedMessage->InitCheck();
-	if (toReturn == B_OK) 
-	{
-		TRACE("Opened the file with flattened message successfully!\n");
-		toReturn = out->Unflatten(flattenedMessage);		// Perform actual read
-		if (B_OK == toReturn) {
-			TRACE("Unflattened the message from disk successfully!\n");
+	if (pLibraryFile->HasResource(B_MESSAGE_TYPE, resourceName)) {
+		out = (BMessage*)pLibraryFile->LoadResource(B_MESSAGE_TYPE, resourceName, &outSize);
+		if (!out) {
+			toReturn = B_NAME_NOT_FOUND;
 		} else {
-			TRACE("Did not succeed to unflatten the message from disk!\n");
+			toReturn = B_OK;
 		}
 	} else {
-		TRACE("Did not succeed to open the message file!\n");
+		out = B_NAME_NOT_FOUND;
 	}
 	
 	return toReturn;
 }
 
+
+
+/**
+ *	/brief		This function populates the dictionary of the messages.
+ *	/details	It finds this input_server add-on library file (using EsperantoInputFilter::FindLibraryFile() ),
+ *				then initializes a BResources object with this file and loads the resources.
+ *	/returns	B_OK if everything goes well and all BMessages are found.
+ *				B_ENTRY_NOT_FOUND if the input_server filter add-on is not found.
+ *				B_NO_INIT if not all required resources were found.
+ */ 
 status_t EsperantoInputFilter::PopulateMap (void)
 {
 	status_t toReturn = B_OK;
+	
+	BResources* pLibraryFile = FindLibraryFile();
+	
+	if (pLibraryFile == NULL) {
+		return B_ENTRY_NOT_FOUND;
+	}
 	
 	BMessage* msg = new BMessage();
 	
 	// ĉ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseC", msg);
+		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ĉ', msg});
 		}
