@@ -1,9 +1,11 @@
 #include <Alert.h>
 #include <File.h>
+#include <FindDirectory.h>
 #include <InputServerFilter.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>
+#include <Resources.h>
 #include <String.h>
 #include <Window.h>
 
@@ -34,7 +36,7 @@ protected:
 	virtual status_t		GetSettings(void);
 	virtual status_t		CheckSettings(void);
 	
-	virtual BResource* 		FindLibraryFile(void);
+	virtual BResources*		FindLibraryFile(void);
 	virtual status_t		LoadMessage(const char* , const BResources*, BMessage*);
 	virtual status_t		PopulateMap(void);
 	
@@ -140,13 +142,13 @@ EsperantoInputFilter::~EsperantoInputFilter()
  *				NULL otherwise.
  *	\note		The caller is responsible for closing the BResources and freeing the used memory!
  */
-BResource* EsperantoInputFilter::FindLibraryFile(void)
+BResources* EsperantoInputFilter::FindLibraryFile(void)
 {
-	BFile toReturnFile();
+	BFile toReturnFile;
 	BResources *toReturnRes = NULL;
 	BPath pathToCheck;
 	
-	status_t result = B_ENTRY_NOT_FOUND;
+	status_t status = B_ENTRY_NOT_FOUND;
 	
 	// First - check the Haiku add-ons directory
 	status = find_directory(B_SYSTEM_ADDONS_DIRECTORY, &pathToCheck);
@@ -208,7 +210,7 @@ BResource* EsperantoInputFilter::FindLibraryFile(void)
  *	\note		Caller is responsible for clearing the allocated memory!
  */
 status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
-											BResources* pLibraryFile,
+											const BResources* pLibraryFile,
 											BMessage* out)
 {
 	status_t toReturn = B_OK;
@@ -225,7 +227,7 @@ status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
 			toReturn = B_OK;
 		}
 	} else {
-		out = B_NAME_NOT_FOUND;
+		toReturn = B_NAME_NOT_FOUND;
 	}
 	
 	return toReturn;
@@ -263,7 +265,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Ĉ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĉ.msg", msg);
+		toReturn = this->LoadMessage("uppercaseC", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'Ĉ', msg});
 		}
@@ -271,7 +273,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 
 	// ĝ	
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĝ.msg", msg);
+		toReturn = this->LoadMessage("lowercaseG", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ĝ', msg});
 		}
@@ -279,7 +281,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Ĝ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĝ.msg", msg);
+		toReturn = this->LoadMessage("uppercaseG.msg", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'Ĝ', msg});
 		}
@@ -287,7 +289,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// ĥ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĥ.msg", msg);
+		toReturn = this->LoadMessage("lowercaseH", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ĥ', msg});
 		}
@@ -295,7 +297,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Ĥ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĥ.msg", msg);
+		toReturn = this->LoadMessage("uppercaseH", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'Ĥ', msg});
 		}
@@ -303,7 +305,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 		
 	// ĵ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ĵ.msg", msg);
+		toReturn = this->LoadMessage("lowercaseJ", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ĵ', msg});
 		}
@@ -311,7 +313,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Ĵ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ĵ.msg", msg);
+		toReturn = this->LoadMessage("uppercaseJ", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'Ĵ', msg});
 		}
@@ -319,7 +321,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// ŝ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ŝ.msg", msg);
+		toReturn = this->LoadMessage("lowercaseS", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ŝ', msg});
 		}
@@ -327,7 +329,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Ŝ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ŝ.msg", msg);
+		toReturn = this->LoadMessage("uppercaseS", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'Ŝ', msg});
 		}
@@ -335,7 +337,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// ŭ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/ŭ.msg", msg);
+		toReturn = this->LoadMessage("lowercaseU", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'ŭ', msg});
 		}
@@ -343,7 +345,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Ŭ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Ŭ.msg", msg);
+		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'Ŭ', msg});
 		}
@@ -351,7 +353,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	
 	// Backspace
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("/boot/home/Projects/Esperanto_filter/Backspace.msg", msg);
+		toReturn = this->LoadMessage("Backspace", pLibraryFile, msg);
 		if (toReturn == B_OK) {
 			this->mMessagesMap.insert({'B', msg});
 		}
@@ -366,11 +368,17 @@ status_t EsperantoInputFilter::InitCheck()
     return B_OK;
 }
 
+
+/**
+ *	\brief		Main filtering function
+ *	\details	This function implements the state machine of the filter.
+ */
 filter_result 
 EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 {
 	static bool	bExpectingThePostfix = false;
-	static char cPreviousKey = '0';
+	static char cOneKeyBack = '0';
+	static char cTwoKeysBack = '0';
 	BFile *messageToSend = NULL;
 	
 	const char* bytes;
@@ -401,17 +409,22 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 			case 'h':
 			case 's':
 			case 'u':
-				cPreviousKey = bytes[0];
+				cTwoKeysBack = bytes[0];
 				break;
 			case '^':
 			{
 				TRACE("Detected caret ^\n");
 				
-				if (cPreviousKey == '0') {
+				if (cTwoKeysBack == '0') {
 					TRACE("The previous letter was not one of the interesting ones.\n");
 					
 					break;
 				}
+				else if () {
+					cTwoKeysBack = cOneKeyBack;
+					cOneKeyBack = '^';	
+				}
+				
 				BMessage *pmBackSpace = new BMessage(*in), 
 						*pmNewCharacter = new BMessage(*in);
 						
@@ -429,27 +442,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 
 				TRACE("Trying to send the backspace\n");
 
-				BFile* messageToSend = new BFile("/boot/home/Projects/Esperanto_filter/Backspace.msg", 	// Try opening the file
-							   B_READ_ONLY);
-				if ((messageToSend->InitCheck()) == B_OK)
-				{
-					TRACE("Opened the file successfully!\n");
-					if (pmBackSpace->Unflatten(messageToSend) == B_OK)	// Perform actual read
-					{
-						TRACE("Read the backspace message!\n");
-						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
-						outList->AddItem(pmBackSpace);
-						TRACE("Added backspace to the output list!\n");
-						messageToSend->Unset();					// Flush and close the file
-						delete messageToSend;
-						messageToSend = NULL;
-					}
-					else {
-						TRACE("Did not succeed to unflatten the backspace!\n");
-					}
-				} else {
-					TRACE("Did not succeed to open the file with backspace!\n");		
-				}
+				
 				
 				
 				
