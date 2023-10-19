@@ -259,7 +259,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'ĉ', msg});
+			this->mMessagesMap.insert({'c', msg});
 		}
 	}
 	
@@ -267,7 +267,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseC", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'Ĉ', msg});
+			this->mMessagesMap.insert({'C', msg});
 		}
 	}
 
@@ -275,7 +275,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseG", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'ĝ', msg});
+			this->mMessagesMap.insert({'g', msg});
 		}
 	}
 	
@@ -283,7 +283,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseG.msg", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'Ĝ', msg});
+			this->mMessagesMap.insert({'G', msg});
 		}
 	}
 	
@@ -291,7 +291,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseH", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'ĥ', msg});
+			this->mMessagesMap.insert({'h', msg});
 		}
 	}
 	
@@ -299,7 +299,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseH", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'Ĥ', msg});
+			this->mMessagesMap.insert({'H', msg});
 		}
 	}
 		
@@ -307,7 +307,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseJ", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'ĵ', msg});
+			this->mMessagesMap.insert({'j', msg});
 		}
 	}
 	
@@ -315,7 +315,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseJ", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'Ĵ', msg});
+			this->mMessagesMap.insert({'J', msg});
 		}
 	}
 	
@@ -323,7 +323,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseS", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'ŝ', msg});
+			this->mMessagesMap.insert({'s', msg});
 		}
 	}
 	
@@ -331,7 +331,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseS", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'Ŝ', msg});
+			this->mMessagesMap.insert({'S', msg});
 		}
 	}
 	
@@ -339,7 +339,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseU", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'ŭ', msg});
+			this->mMessagesMap.insert({'u', msg});
 		}
 	}
 	
@@ -347,7 +347,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, msg);
 		if (toReturn == B_OK) {
-			this->mMessagesMap.insert({'Ŭ', msg});
+			this->mMessagesMap.insert({'U', msg});
 		}
 	}
 	
@@ -369,6 +369,11 @@ status_t EsperantoInputFilter::InitCheck()
 }
 
 
+#define		STATE_0_NORMAL_WORK				(1)
+#define		STATE_1_CHARACTER_RECEIVED		(2)
+#define		STATE_2_CARET_RECEIVED			(3)
+#define		STATE_3_SECOND_CARET_RECEIVED	(4)
+
 /**
  *	\brief		Main filtering function
  *	\details	This function implements the state machine of the filter.
@@ -377,8 +382,9 @@ filter_result
 EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 {
 	static bool	bExpectingThePostfix = false;
-	static char cOneKeyBack = '0';
-	static char cTwoKeysBack = '0';
+	static char cSavedCharacter = '0';
+	static int	eCurrentState = STATE_0_NORMAL_WORK;
+
 	BFile *messageToSend = NULL;
 	
 	const char* bytes;
@@ -395,22 +401,53 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 	
 	if (in->what == B_KEY_DOWN)
 	{
-		int8 val;
-		switch (bytes[0]) {
-			case 'C':
-			case 'H':
-			case 'J':
-			case 'U':
-			case 'S':
-			case 'G':
-			case 'c':
-			case 'g':
-			case 'j':
-			case 'h':
-			case 's':
-			case 'u':
-				cTwoKeysBack = bytes[0];
+		switch (eCurrentState)
+		{
+			case 	STATE_0_NORMAL_WORK:
+			{
+				switch (bytes[0]) {
+					case 'C':
+					case 'H':
+					case 'J':
+					case 'U':
+					case 'S':
+					case 'G':
+					case 'c':
+					case 'g':
+					case 'j':
+					case 'h':
+					case 's':
+					case 'u':
+						cSavedCharacter = bytes[0];
+						break;
+					default:
+						break;
+				};		// <-- end of "switch (interesting letter)"
+				eCurrentState = STATE_1_CHARACTER_RECEIVED;
 				break;
+			}
+			
+			case 	STATE_1_CHARACTER_RECEIVED:
+			{
+				switch (bytes[0]) {
+					case '^':
+					{
+						BMessage *pmBackSpace = this->MessagesMap['B'], 
+								 *pmNewCharacter = this->MessagesMap[cSavedCharacter];
+								 
+						
+					}
+			
+				break;
+			}	
+			
+			
+			
+		}
+		
+		
+		int8 val;
+		
 			case '^':
 			{
 				TRACE("Detected caret ^\n");
@@ -425,8 +462,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					cOneKeyBack = '^';	
 				}
 				
-				BMessage *pmBackSpace = new BMessage(*in), 
-						*pmNewCharacter = new BMessage(*in);
+				
 						
 /*				// Prepare the backspace character
 				pmBackSpace->ReplaceInt32("key", 0x1E);
