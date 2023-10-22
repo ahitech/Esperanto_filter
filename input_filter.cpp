@@ -384,8 +384,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 	static bool	bExpectingThePostfix = false;
 	static char cSavedCharacter = '0';
 	static int	eCurrentState = STATE_0_NORMAL_WORK;
-
-	BFile *messageToSend = NULL;
+	static BMessage 	sMessage;
 	
 	const char* bytes;
 	if (in->FindString("bytes", &bytes) != B_OK)
@@ -419,6 +418,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					case 's':
 					case 'u':
 						cSavedCharacter = bytes[0];
+						sMessage.SetTo();
 						break;
 					default:
 						break;
@@ -434,8 +434,20 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					{
 						BMessage *pmBackSpace = this->MessagesMap['B'], 
 								 *pmNewCharacter = this->MessagesMap[cSavedCharacter];
-								 
 						
+						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
+						//	pmBackSpace->ReplaceInt32("modifiers", modifiers);	<-- Are modifiers necessary?
+ 						outList->AddItem(pmBackSpace);
+ 						
+ 						pmNewCharacter->ReplaceInt64("when", real_time_clock_usecs());
+ 						pmNewCharacter->ReplaceInt32("modifiers", modifiers);	// Here probably they are.
+ 						outList->AddItem(pmNewCharacter);
+						
+						break;
+					}
+					default:
+					{
+							
 					}
 			
 				break;
