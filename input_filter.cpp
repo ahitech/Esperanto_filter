@@ -385,17 +385,23 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 	static char cSavedCharacter = '0';
 	static int	eCurrentState = STATE_0_NORMAL_WORK;
 	static BMessage 	sMessage;
+	filter_result	toReturn = B_DISPATCH_MESSAGE;
+	
+	if (!in)		// Sanity check
+	{
+		return B_SKIP_MESSAGE;
+	}
 	
 	const char* bytes;
 	if (in->FindString("bytes", &bytes) != B_OK)
 	{
-		return B_DISPATCH_MESSAGE;
+		return toReturn;
 	}
 
 	int32 modifiers;
 	if (in->FindInt32("modifiers", &modifiers) != B_OK)
 	{
-		return B_DISPATCH_MESSAGE;
+		return toReturn;
 	}
 	
 	if (in->what == B_KEY_DOWN)
@@ -417,10 +423,14 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					case 'h':
 					case 's':
 					case 'u':
+					{
 						cSavedCharacter = bytes[0];
-						sMessage.SetTo();
+						sMessage = *in;
+						toReturn = B_DISPATCH_MESSAGE;
 						break;
+					}
 					default:
+						toReturn = B_DISPATCH_MESSAGE;
 						break;
 				};		// <-- end of "switch (interesting letter)"
 				eCurrentState = STATE_1_CHARACTER_RECEIVED;
@@ -429,11 +439,12 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 			
 			case 	STATE_1_CHARACTER_RECEIVED:
 			{
-				switch (bytes[0]) {
+				switch (bytes[0]) 
+				{
 					case '^':
 					{
-						BMessage *pmBackSpace = this->MessagesMap['B'], 
-								 *pmNewCharacter = this->MessagesMap[cSavedCharacter];
+						BMessage *pmBackSpace = this->mMessagesMap['B'], 
+								 *pmNewCharacter = this->mMessagesMap[cSavedCharacter];
 						
 						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
 						//	pmBackSpace->ReplaceInt32("modifiers", modifiers);	<-- Are modifiers necessary?
@@ -442,109 +453,85 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
  						pmNewCharacter->ReplaceInt64("when", real_time_clock_usecs());
  						pmNewCharacter->ReplaceInt32("modifiers", modifiers);	// Here probably they are.
  						outList->AddItem(pmNewCharacter);
-						
+ 						
+						eCurrentState = STATE_2_CARET_RECEIVED;
+						toReturn = B_DISPATCH_MESSAGE;
 						break;
 					}
 					default:
 					{
-							
-					}
-			
-				break;
-			}	
-			
-			
-			
-		}
-		
-		
-		int8 val;
-		
-			case '^':
-			{
-				TRACE("Detected caret ^\n");
-				
-				if (cTwoKeysBack == '0') {
-					TRACE("The previous letter was not one of the interesting ones.\n");
-					
-					break;
-				}
-				else if () {
-					cTwoKeysBack = cOneKeyBack;
-					cOneKeyBack = '^';	
-				}
-				
-				
+						// The user has entered a character which is not a caret.
+						// We need to reset all expectations and start anew.
+						eCurrentState = STATE_0_NORMAL_WORK;
+						sMessage.MakeEmpty();
+						cSavedCharacter = '0';
 						
-/*				// Prepare the backspace character
-				pmBackSpace->ReplaceInt32("key", 0x1E);
-				pmBackSpace->ReplaceInt32("modifiers", 0);
-//				pmBackSpace->ReplaceUint8("states", 0);
-				pmBackSpace->RemoveName("bytes");
-				pmBackSpace->AddString("bytes", "");
-				pmBackSpace->ReplaceInt8("byte", 0x08);
-				pmBackSpace->ReplaceInt32("raw_char", 0x08);
-				
-				
-*/				
-
-				TRACE("Trying to send the backspace\n");
-
-				
-				
-				
-				
-				/* Test */
-
-				switch (cPreviousKey) {
-					case 'C':
-					{
-						cPreviousKey = '0';
-						
-						TRACE("The previous letter was C\n");
-						
-						
-				
-						
+						// Probably the current character was one of those which may have diactrics
+						toReturn = this->Filter(in, outList);
 						break;
-					}
-					default:
-						cPreviousKey = '0';
-						break;			
-				};	// <-- end of "switch (previous key)"
-				
-				TRACE("Before exiting the filter: outList has N messages.\n");
-
-				
-				break;
+					}		
+				}	
+				break;	// <-- end of "case (the second entered character)"
 			}
+			case STATE_2_CARET_RECEIVED:
+			{
+				switch (bytes[0])
+				{
+					case '^':	// Second caret after a caret removes diactrics and prints 
+								// the original character and a single caret
+					{
+						if (true)	//	<-- This should be changed to a setting
+						{
+							BMessage *pmBackSpace = this->mMessagesMap['B'], 
+									 *pmNewCharacter = new BMessage(),
+									 *pmCaret = new BMessage();
+							*pmNewCharacter = sMessage;
+							*pmCaret = *in;
+						
+							// Sending Backspace
+							pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
+							//	pmBackSpace->ReplaceInt32("modifiers", modifiers);	<-- Are modifiers necessary?
+	 						outList->AddItem(pmBackSpace);
+	 						
+	 						// Sending the original character
+	 						pmNewCharacter->ReplaceInt64("when", real_time_clock_usecs());
+	 						// pmNewCharacter->ReplaceInt32("modifiers", modifiers); <-- The modifiers are original
+	 						outList->AddItem(pmNewCharacter);
+	 						
+	 						// Sending a single caret
+	 						pmCaret->ReplaceInt64("when", real_time_clock_usecs());
+	 						outList->AddItem(pmCaret);
+	 						
+	 						// Returning to normal work
+							eCurrentState = STATE_0_NORMAL_WORK;
+							sMessage.MakeEmpty();
+							cSavedCharacter = '0';
+
+							toReturn = B_DISPATCH_MESSAGE;
+						}
+						break;
+					}	// <-- end of "case (two carets received)"
+					default:
+					{
+						// The user has entered a character which is not a caret.
+						// We need to reset all expectations and start anew.
+						eCurrentState = STATE_0_NORMAL_WORK;
+						sMessage.MakeEmpty();
+						cSavedCharacter = '0';
+						
+						// Probably the current character was one of those which may have diactrics
+						toReturn = this->Filter(in, outList);
+						break;
+					}
+				}	// <-- end of "switch (character after caret)"
+				break;
+			}	// <-- end of "case (next charater after received caret)"
 			default:
-				cPreviousKey = '0';
-				break;
-		};	// <-- end of "switch (first character of the input string)"
-			
-/*			BFile *writeTo = new BFile(PATH_TO_BIG_SEE_FILE, 	// Try opening the file
-							   B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-			if ((writeTo->InitCheck()) == B_OK)
-			{
-				in->Flatten (writeTo);	// Perform actual write
-				writeTo->Unset();					// Flush and close the file
-				delete writeTo;
-			}
-		}
-		else if  (bytes[0] == B_BACKSPACE) {
-			BFile *writeTo = new BFile(PATH_TO_BAKSPASE_FILE, 	// Try opening the file
-							   B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-			if ((writeTo->InitCheck()) == B_OK)
-			{
-				in->Flatten (writeTo);	// Perform actual write
-				writeTo->Unset();					// Flush and close the file
-				delete writeTo;
-			}
-*/
+				toReturn = B_DISPATCH_MESSAGE;
+		}	// <-- end of "switch (current state of the state machine)"
 	}	// <-- end of "if (a key was pressed)"
 	
-	return B_DISPATCH_MESSAGE;
+	return toReturn;
 }
 
 extern "C" BInputServerFilter* instantiate_input_filter() {
