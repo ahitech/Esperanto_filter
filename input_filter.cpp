@@ -21,7 +21,11 @@
 
 #define		POSTFIX_KEYS_NAME	"Postfix keys"
 
-#define		TRACE(text)		{ FILE* logA = fopen("/boot/home/Log.txt", "a"); if (logA) { fprintf(logA, text); fflush(logA); fclose(logA); } }
+#ifdef		DEBUG
+#define		TRACE(text)		{ FILE* logA = fopen("/boot/home/Log.txt", "at"); if (!logA) { logA = fopen("/boot/home/Log.txt", "wt"); } if (logA) { fprintf(logA, text); fflush(logA); fclose(logA); } }
+#else
+#define		TRACE(text)
+#endif
 
 class EsperantoInputFilter : public BInputServerFilter
 {
@@ -224,6 +228,7 @@ status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
 		if (!out) {
 			toReturn = B_NAME_NOT_FOUND;
 		} else {
+			TRACE("Loaded the resource successfully!");
 			toReturn = B_OK;
 		}
 	} else {
@@ -259,6 +264,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'c\' successfully!");
 			this->mMessagesMap.insert({'c', msg});
 		}
 	}
@@ -267,6 +273,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseC", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'C\' successfully!");
 			this->mMessagesMap.insert({'C', msg});
 		}
 	}
@@ -275,6 +282,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseG", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'g\' successfully!");
 			this->mMessagesMap.insert({'g', msg});
 		}
 	}
@@ -283,6 +291,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseG.msg", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'G\' successfully!");
 			this->mMessagesMap.insert({'G', msg});
 		}
 	}
@@ -291,6 +300,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseH", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'h\' successfully!");
 			this->mMessagesMap.insert({'h', msg});
 		}
 	}
@@ -299,6 +309,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseH", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'H\' successfully!");
 			this->mMessagesMap.insert({'H', msg});
 		}
 	}
@@ -307,6 +318,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseJ", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'j\' successfully!");
 			this->mMessagesMap.insert({'j', msg});
 		}
 	}
@@ -315,6 +327,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseJ", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'J\' successfully!");
 			this->mMessagesMap.insert({'J', msg});
 		}
 	}
@@ -323,6 +336,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseS", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'s\' successfully!");
 			this->mMessagesMap.insert({'s', msg});
 		}
 	}
@@ -331,6 +345,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseS", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'S\' successfully!");
 			this->mMessagesMap.insert({'S', msg});
 		}
 	}
@@ -339,6 +354,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseU", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'u\' successfully!");
 			this->mMessagesMap.insert({'u', msg});
 		}
 	}
@@ -347,6 +363,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for \'U\' successfully!");
 			this->mMessagesMap.insert({'U', msg});
 		}
 	}
@@ -355,6 +372,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("Backspace", pLibraryFile, msg);
 		if (toReturn == B_OK) {
+			TRACE("Added message for Backspace successfully!");
 			this->mMessagesMap.insert({'B', msg});
 		}
 	}
