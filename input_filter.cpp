@@ -48,7 +48,20 @@ protected:
 	BPoint					fCurrentMousePosition;
 	BMessage*				fSettings;
 
-	std::map<char, BMessage* > mMessagesMap;	
+	BMessage				*pMessagec,
+							*pMessageC,
+							*pMessageg,
+							*pMessageG,
+							*pMessageh,
+							*pMessageH,
+							*pMessagej,
+							*pMessageJ,
+							*pMessages,
+							*pMessageS,
+							*pMessageu,
+							*pMessageU,
+							*pMessageB;
+//	std::map<char, BMessage* > mMessagesMap;	
 };
 
 
@@ -122,17 +135,41 @@ status_t	EsperantoInputFilter::CheckSettings(void)
 
 
 EsperantoInputFilter::EsperantoInputFilter()
+	: pMessagec(NULL),
+	  pMessageC(NULL),
+	  pMessageg(NULL),
+	  pMessageG(NULL),
+	  pMessageh(NULL),
+	  pMessageH(NULL),
+	  pMessagej(NULL),
+	  pMessageJ(NULL),
+	  pMessages(NULL),
+	  pMessageS(NULL),
+	  pMessageu(NULL),
+	  pMessageU(NULL),
+	  pMessageB(NULL)
 {
 	this->fSettings = new BMessage (SETTINGS_MESSAGE_CONSTANT);
 	
-	this->mMessagesMap.clear();
 //	GetSettings();
 
 }
 
 EsperantoInputFilter::~EsperantoInputFilter()
 {
-
+	if (pMessagec) { delete pMessagec; pMessagec = NULL; }
+	if (pMessageC) { delete pMessageC; pMessageC = NULL; }
+	if (pMessageg) { delete pMessageg; pMessageg = NULL; }
+	if (pMessageG) { delete pMessageG; pMessageG = NULL; }
+	if (pMessageh) { delete pMessageh; pMessageh = NULL; }
+	if (pMessageH) { delete pMessageH; pMessageH = NULL; }
+	if (pMessagej) { delete pMessagej; pMessagej = NULL; }
+	if (pMessageJ) { delete pMessageJ; pMessageJ = NULL; }
+	if (pMessages) { delete pMessages; pMessages = NULL; }
+	if (pMessageS) { delete pMessageS; pMessageS = NULL; }
+	if (pMessageu) { delete pMessageu; pMessageu = NULL; }
+	if (pMessageU) { delete pMessageU; pMessageU = NULL; }
+	if (pMessageB) { delete pMessageB; pMessageB = NULL; }
 }
 
 
@@ -219,7 +256,7 @@ status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
 {
 	status_t toReturn = B_OK;
 	size_t	outSize = 0;
-	if (!out || !pLibraryFile) { return B_NO_INIT; }
+	if (!resourceName || !pLibraryFile) { return B_NO_INIT; }
 	
 	TRACE(resourceName);
 	
@@ -258,122 +295,112 @@ status_t EsperantoInputFilter::PopulateMap (void)
 		return B_ENTRY_NOT_FOUND;
 	}
 	
-	BMessage* msg = new BMessage();
+	pLibraryFile->PreloadResourceType(B_MESSAGE_TYPE);
+	
+	BMessage* msg = NULL;
 	
 	// ĉ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, msg);
+		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, pMessagec);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'c\' successfully!");
-			this->mMessagesMap.insert({'c', msg});
 		}
 	}
 	
 	// Ĉ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("uppercaseC", pLibraryFile, msg);
+		toReturn = this->LoadMessage("uppercaseC", pLibraryFile, pMessageC);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'C\' successfully!");
-			this->mMessagesMap.insert({'C', msg});
 		}
 	}
 
 	// ĝ	
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseG", pLibraryFile, msg);
+		toReturn = this->LoadMessage("lowercaseG", pLibraryFile, pMessageg);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'g\' successfully!");
-			this->mMessagesMap.insert({'g', msg});
 		}
 	}
 	
 	// Ĝ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("uppercaseG.msg", pLibraryFile, msg);
+		toReturn = this->LoadMessage("uppercaseG", pLibraryFile, pMessageG);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'G\' successfully!");
-			this->mMessagesMap.insert({'G', msg});
 		}
 	}
 	
 	// ĥ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseH", pLibraryFile, msg);
+		toReturn = this->LoadMessage("lowercaseH", pLibraryFile, pMessageh);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'h\' successfully!");
-			this->mMessagesMap.insert({'h', msg});
 		}
 	}
 	
 	// Ĥ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("uppercaseH", pLibraryFile, msg);
+		toReturn = this->LoadMessage("uppercaseH", pLibraryFile, pMessageH);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'H\' successfully!");
-			this->mMessagesMap.insert({'H', msg});
 		}
 	}
 		
 	// ĵ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseJ", pLibraryFile, msg);
+		toReturn = this->LoadMessage("lowercaseJ", pLibraryFile, pMessagej);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'j\' successfully!");
-			this->mMessagesMap.insert({'j', msg});
 		}
 	}
 	
 	// Ĵ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("uppercaseJ", pLibraryFile, msg);
+		toReturn = this->LoadMessage("uppercaseJ", pLibraryFile, pMessageJ);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'J\' successfully!");
-			this->mMessagesMap.insert({'J', msg});
 		}
 	}
 	
 	// ŝ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseS", pLibraryFile, msg);
+		toReturn = this->LoadMessage("lowercaseS", pLibraryFile, pMessages);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'s\' successfully!");
-			this->mMessagesMap.insert({'s', msg});
 		}
 	}
 	
 	// Ŝ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("uppercaseS", pLibraryFile, msg);
+		toReturn = this->LoadMessage("uppercaseS", pLibraryFile, pMessageS);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'S\' successfully!");
-			this->mMessagesMap.insert({'S', msg});
 		}
 	}
 	
 	// ŭ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("lowercaseU", pLibraryFile, msg);
+		toReturn = this->LoadMessage("lowercaseU", pLibraryFile, pMessageu);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'u\' successfully!");
-			this->mMessagesMap.insert({'u', msg});
 		}
 	}
 	
 	// Ŭ
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, msg);
+		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, pMessageU);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'U\' successfully!");
-			this->mMessagesMap.insert({'U', msg});
+			pMessageU = msg;
 		}
 	}
 	
 	// Backspace
 	if (toReturn == B_OK) {
-		toReturn = this->LoadMessage("Backspace", pLibraryFile, msg);
+		toReturn = this->LoadMessage("Backspace", pLibraryFile, pMessageB);
 		if (toReturn == B_OK) {
 			TRACE("Added message for Backspace successfully!");
-			this->mMessagesMap.insert({'B', msg});
 		}
 	}
 
@@ -461,8 +488,22 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				{
 					case '^':
 					{
-						BMessage *pmBackSpace = this->mMessagesMap['B'], 
-								 *pmNewCharacter = this->mMessagesMap[cSavedCharacter];
+						BMessage *pmBackSpace = this->pMessageB, 
+								 *pmNewCharacter;
+						switch (cSavedCharacter) {
+							case 'c': pmNewCharacter = pMessagec; break;
+							case 'C': pmNewCharacter = pMessageC; break;
+							case 'g': pmNewCharacter = pMessageg; break;
+							case 'G': pmNewCharacter = pMessageG; break;
+							case 'h': pmNewCharacter = pMessageh; break;
+							case 'H': pmNewCharacter = pMessageH; break;
+							case 'j': pmNewCharacter = pMessagej; break;
+							case 'J': pmNewCharacter = pMessageJ; break;
+							case 's': pmNewCharacter = pMessages; break;
+							case 'S': pmNewCharacter = pMessageS; break;
+							default:  pmNewCharacter = NULL; break;
+						}
+						if (!pmNewCharacter) { toReturn = B_DISPATCH_MESSAGE; break; }
 						
 						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
 						//	pmBackSpace->ReplaceInt32("modifiers", modifiers);	<-- Are modifiers necessary?
@@ -500,9 +541,9 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					{
 						if (true)	//	<-- This should be changed to a setting
 						{
-							BMessage *pmBackSpace = this->mMessagesMap['B'], 
-									 *pmNewCharacter = new BMessage(),
-									 *pmCaret = new BMessage();
+							BMessage *pmBackSpace = pMessageB, 
+									 *pmNewCharacter,
+									 *pmCaret;
 							*pmNewCharacter = sMessage;
 							*pmCaret = *in;
 						
