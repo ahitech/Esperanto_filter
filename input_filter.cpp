@@ -155,21 +155,16 @@ EsperantoInputFilter::EsperantoInputFilter()
 
 }
 
+
+
+/**
+ *	\brief		Destructor of the EsperantoInputFilter
+ *	\note		Pointers to the messages for individual letters belong to the BResources class.
+ *				They shouldn't be "freed".
+ */
 EsperantoInputFilter::~EsperantoInputFilter()
 {
-	if (pMessagec) { delete pMessagec; pMessagec = NULL; }
-	if (pMessageC) { delete pMessageC; pMessageC = NULL; }
-	if (pMessageg) { delete pMessageg; pMessageg = NULL; }
-	if (pMessageG) { delete pMessageG; pMessageG = NULL; }
-	if (pMessageh) { delete pMessageh; pMessageh = NULL; }
-	if (pMessageH) { delete pMessageH; pMessageH = NULL; }
-	if (pMessagej) { delete pMessagej; pMessagej = NULL; }
-	if (pMessageJ) { delete pMessageJ; pMessageJ = NULL; }
-	if (pMessages) { delete pMessages; pMessages = NULL; }
-	if (pMessageS) { delete pMessageS; pMessageS = NULL; }
-	if (pMessageu) { delete pMessageu; pMessageu = NULL; }
-	if (pMessageU) { delete pMessageU; pMessageU = NULL; }
-	if (pMessageB) { delete pMessageB; pMessageB = NULL; }
+	// No need to delete pointers to the resources.
 }
 
 
@@ -261,8 +256,8 @@ status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
 	TRACE(resourceName);
 	
 	if (pLibraryFile->HasResource(B_MESSAGE_TYPE, resourceName)) {
-		out = (BMessage*)pLibraryFile->LoadResource(B_MESSAGE_TYPE, resourceName, &outSize);
-		if (!out) {
+		out->Unflatten((const char *)(pLibraryFile->LoadResource(B_MESSAGE_TYPE, resourceName, &outSize)));
+		if (outSize == 0) {
 			toReturn = B_NAME_NOT_FOUND;
 		} else {
 			TRACE("Loaded the resource successfully!");
@@ -296,9 +291,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	}
 	
 	pLibraryFile->PreloadResourceType(B_MESSAGE_TYPE);
-	
-	BMessage* msg = NULL;
-	
+		
 	// ĉ
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, pMessagec);
@@ -392,7 +385,6 @@ status_t EsperantoInputFilter::PopulateMap (void)
 		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, pMessageU);
 		if (toReturn == B_OK) {
 			TRACE("Added message for \'U\' successfully!");
-			pMessageU = msg;
 		}
 	}
 	
