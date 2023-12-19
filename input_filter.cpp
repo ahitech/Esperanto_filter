@@ -61,6 +61,7 @@ protected:
 							*pMessageu,
 							*pMessageU,
 							*pMessageB;
+	BFile					*pLibraryFile;
 //	std::map<char, BMessage* > mMessagesMap;	
 };
 
@@ -147,24 +148,32 @@ EsperantoInputFilter::EsperantoInputFilter()
 	  pMessageS(NULL),
 	  pMessageu(NULL),
 	  pMessageU(NULL),
-	  pMessageB(NULL)
+	  pMessageB(NULL),
+	  pLibraryFile(NULL)
 {
 	this->fSettings = new BMessage (SETTINGS_MESSAGE_CONSTANT);
 	
+	PopulateMap();
 //	GetSettings();
 
 }
 
-
-
-/**
- *	\brief		Destructor of the EsperantoInputFilter
- *	\note		Pointers to the messages for individual letters belong to the BResources class.
- *				They shouldn't be "freed".
- */
 EsperantoInputFilter::~EsperantoInputFilter()
 {
-	// No need to delete pointers to the resources.
+	if (pMessagec) { delete pMessagec; pMessagec = NULL; }
+	if (pMessageC) { delete pMessageC; pMessageC = NULL; }
+	if (pMessageg) { delete pMessageg; pMessageg = NULL; }
+	if (pMessageG) { delete pMessageG; pMessageG = NULL; }
+	if (pMessageh) { delete pMessageh; pMessageh = NULL; }
+	if (pMessageH) { delete pMessageH; pMessageH = NULL; }
+	if (pMessagej) { delete pMessagej; pMessagej = NULL; }
+	if (pMessageJ) { delete pMessageJ; pMessageJ = NULL; }
+	if (pMessages) { delete pMessages; pMessages = NULL; }
+	if (pMessageS) { delete pMessageS; pMessageS = NULL; }
+	if (pMessageu) { delete pMessageu; pMessageu = NULL; }
+	if (pMessageU) { delete pMessageU; pMessageU = NULL; }
+	if (pMessageB) { delete pMessageB; pMessageB = NULL; }
+	if (pLibraryFile) { delete pLibraryFile; pLibraryFile = NULL; }
 }
 
 
@@ -180,55 +189,135 @@ EsperantoInputFilter::~EsperantoInputFilter()
  */
 BResources* EsperantoInputFilter::FindLibraryFile(void)
 {
-	BFile toReturnFile;
-	BResources *toReturnRes = NULL;
+	BResources *toReturnRes = new BResources();
 	BPath pathToCheck;
+	if (!pLibraryFile) { pLibraryFile = new BFile(); }
 	
 	status_t status = B_ENTRY_NOT_FOUND;
 	
-	// First - check the Haiku add-ons directory
-	status = find_directory(B_SYSTEM_ADDONS_DIRECTORY, &pathToCheck);
+	FILE* log = fopen ("/boot/home/log.txt", "w");
+	if (log) {
+		fprintf(log, "Entered function FindLibraryFile().\n");
+		fflush(log);
+	}
 	
-	if (status != B_OK) {
-		pathToCheck.Append("input_server/filters/EsperantoFilter");
-		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	// First - check the Haiku add-ons directory
+	if (status != B_OK)
+	{
+		status = find_directory(B_SYSTEM_ADDONS_DIRECTORY, &pathToCheck);
+		
+		if (status == B_OK) {
+			if (log) {
+				fprintf(log, "Found directory %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			pathToCheck.Append("input_server/filters/EsperantoFilter");
+			status = pLibraryFile->SetTo(pathToCheck.Path(), B_READ_ONLY);
+			if (status == B_OK)
+			{
+				fprintf(log, "Found file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			else {
+				fprintf(log, "Did not find file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+		}
 	}
 	
 	// Second - check the Haiku non-packaged add-ons directory
-	status = find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &pathToCheck);
-	
-	if (status != B_OK) {
-		pathToCheck.Append("input_server/filters/EsperantoFilter");
-		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	if (status != B_OK)
+	{
+		status = find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &pathToCheck);
+		
+		if (status == B_OK) {
+			if (log) {
+				fprintf(log, "Found directory %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			pathToCheck.Append("input_server/filters/EsperantoFilter");
+			status = pLibraryFile->SetTo(pathToCheck.Path(), B_READ_ONLY);
+			if (status == B_OK)
+			{
+				fprintf(log, "Found file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			else {
+				fprintf(log, "Did not find file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+		}
 	}
 	
 	// Third - check the user's add-ons directory
-	status = find_directory(B_USER_ADDONS_DIRECTORY, &pathToCheck);
-	
-	if (status != B_OK) {
-		pathToCheck.Append("input_server/filters/EsperantoFilter");
-		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	if (status != B_OK)
+	{
+		status = find_directory(B_USER_ADDONS_DIRECTORY, &pathToCheck);
+		
+		if (status == B_OK) {
+			if (log) {
+				fprintf(log, "Found directory %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			pathToCheck.Append("input_server/filters/EsperantoFilter");
+			status = pLibraryFile->SetTo(pathToCheck.Path(), B_READ_ONLY);
+			if (status == B_OK)
+			{
+				fprintf(log, "Found file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			else {
+				fprintf(log, "Did not find file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+		}
 	}
 	
 	// Fourth - check the user's non-packaged add-ons directory
-	status = find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &pathToCheck);
-	
-	if (status != B_OK) {
-		pathToCheck.Append("input_server/filters/EsperantoFilter");
-		status = toReturnFile.SetTo(pathToCheck.Path(), B_READ_ONLY);
+	if (status != B_OK)
+	{
+		status = find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &pathToCheck);
+		
+		if (status == B_OK) {
+			if (log) {
+				fprintf(log, "Found directory %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			pathToCheck.Append("input_server/filters/EsperantoFilter");
+			status = pLibraryFile->SetTo(pathToCheck.Path(), B_READ_ONLY);
+			if (status == B_OK)
+			{
+				fprintf(log, "Found file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+			else {
+				fprintf(log, "Did not find file %s.\n", pathToCheck.Path());
+				fflush(log);
+			}
+		}
 	}
 	
 	// It's really strange that we arrived here, since this code has to be
 	// executed somehow, but the library can't be found anywhere. Well, let's report
 	// an error.
 	if (status != B_OK) {
+		if (log) {
+			fprintf (log, "Could not find the library file at all. Bailing out...\n");
+			fflush(log);
+		}
 		return (NULL);
 	}
 	
 	// File of the library is found. Let's check its resources:
-	status = toReturnRes->SetTo(&toReturnFile);
-	if (status != B_OK) {
-		return NULL;
+	if (toReturnRes) {
+		status = toReturnRes->SetTo(pLibraryFile);
+		if (status != B_OK) {
+			if (log) {
+				fprintf (log, "Could not set the resources file to the found file %s. Bailing out...\n", pathToCheck.Path());
+				fflush(log);
+			}
+			return NULL;
+		}
 	}
 	return toReturnRes;
 }
@@ -239,7 +328,9 @@ BResources* EsperantoInputFilter::FindLibraryFile(void)
  *	\brief		Load message into one of the parameters
  *	\param	resourceName[IN]	Name of the resource to load
  *	\param	pLibraryFile[IN]	Pointer to the resources file
- *	\param	out[OUT]			Pointer to the unflattened message
+ *	\param	out[OUT]			Pointer to the unflattened message.
+ *								Can be NULL (and, as a matter of fact, expected).
+ *								Is allocated within the function.
  *	\return		B_OK	If succeeded to unflatten the message
  *				B_NO_INIT	If one of the input parameters are NULL
  *				B_NAME_NOT_FOUND	If the specified message was not found
@@ -249,22 +340,42 @@ status_t EsperantoInputFilter::LoadMessage( const char* resourceName,
 											const BResources* pLibraryFile,
 											BMessage* out)
 {
+	FILE* log = fopen("/boot/home/log.txt", "w");
+	
 	status_t toReturn = B_OK;
 	size_t	outSize = 0;
 	if (!resourceName || !pLibraryFile) { return B_NO_INIT; }
+	const void* loadedData;
 	
-	TRACE(resourceName);
+	TRACE(resourceName); TRACE("\n");
 	
 	if (pLibraryFile->HasResource(B_MESSAGE_TYPE, resourceName)) {
-		out->Unflatten((const char *)(pLibraryFile->LoadResource(B_MESSAGE_TYPE, resourceName, &outSize)));
-		if (outSize == 0) {
+		
+		// Loading the message into memory
+		loadedData = (BMessage*)pLibraryFile->LoadResource(B_MESSAGE_TYPE, resourceName, &outSize);
+		if (!loadedData) {
 			toReturn = B_NAME_NOT_FOUND;
 		} else {
-			TRACE("Loaded the resource successfully!");
+			TRACE("Loaded the resource successfully!\n");
 			toReturn = B_OK;
+		}
+		
+		// Unflatten the loaded data
+		if (!out) { out = new BMessage(); }
+		if (out) { 
+			out->Unflatten((const char*)loadedData);
+			TRACE("Unflattened the message\n");
+			if (out->what == '_KYD')
+			{
+				TRACE("The message is KeyDown message.\n");	
+			} else {
+				TRACE("The message is something problematic.\n");
+			}
 		}
 	} else {
 		toReturn = B_NAME_NOT_FOUND;
+		out = NULL;
+		TRACE("Didn't succeed to unflatten the message.\n");
 	}
 	
 	return toReturn;
@@ -291,12 +402,14 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	}
 	
 	pLibraryFile->PreloadResourceType(B_MESSAGE_TYPE);
-		
+	
+	BMessage* msg = NULL;
+	
 	// ĉ
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseC", pLibraryFile, pMessagec);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'c\' successfully!");
+			TRACE("Added message for \'c\' successfully!\n");
 		}
 	}
 	
@@ -304,7 +417,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseC", pLibraryFile, pMessageC);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'C\' successfully!");
+			TRACE("Added message for \'C\' successfully!\n");
 		}
 	}
 
@@ -312,7 +425,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseG", pLibraryFile, pMessageg);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'g\' successfully!");
+			TRACE("Added message for \'g\' successfully!\n");
 		}
 	}
 	
@@ -320,7 +433,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseG", pLibraryFile, pMessageG);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'G\' successfully!");
+			TRACE("Added message for \'G\' successfully!\n");
 		}
 	}
 	
@@ -328,7 +441,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseH", pLibraryFile, pMessageh);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'h\' successfully!");
+			TRACE("Added message for \'h\' successfully!\n");
 		}
 	}
 	
@@ -336,7 +449,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseH", pLibraryFile, pMessageH);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'H\' successfully!");
+			TRACE("Added message for \'H\' successfully!\n");
 		}
 	}
 		
@@ -344,7 +457,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseJ", pLibraryFile, pMessagej);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'j\' successfully!");
+			TRACE("Added message for \'j\' successfully!\n");
 		}
 	}
 	
@@ -352,7 +465,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseJ", pLibraryFile, pMessageJ);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'J\' successfully!");
+			TRACE("Added message for \'J\' successfully!\n");
 		}
 	}
 	
@@ -360,7 +473,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseS", pLibraryFile, pMessages);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'s\' successfully!");
+			TRACE("Added message for \'s\' successfully!\n");
 		}
 	}
 	
@@ -368,7 +481,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseS", pLibraryFile, pMessageS);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'S\' successfully!");
+			TRACE("Added message for \'S\' successfully!\n");
 		}
 	}
 	
@@ -376,7 +489,7 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("lowercaseU", pLibraryFile, pMessageu);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'u\' successfully!");
+			TRACE("Added message for \'u\' successfully!\n");
 		}
 	}
 	
@@ -384,7 +497,8 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("uppercaseU", pLibraryFile, pMessageU);
 		if (toReturn == B_OK) {
-			TRACE("Added message for \'U\' successfully!");
+			TRACE("Added message for \'U\' successfully!\n");
+			pMessageU = msg;
 		}
 	}
 	
@@ -392,7 +506,12 @@ status_t EsperantoInputFilter::PopulateMap (void)
 	if (toReturn == B_OK) {
 		toReturn = this->LoadMessage("Backspace", pLibraryFile, pMessageB);
 		if (toReturn == B_OK) {
-			TRACE("Added message for Backspace successfully!");
+			TRACE("Added message for Backspace successfully!\n");
+		}
+		if (!pMessageB) {
+			TRACE("Message for Backspace is NULL!\n");
+		} else if (pMessageB->what != '_KYD') {
+			TRACE("Message for Backspace is not KeyDown!\n");
 		}
 	}
 
@@ -447,6 +566,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 		{
 			case 	STATE_0_NORMAL_WORK:
 			{
+				TRACE("Normal work.\n");
 				switch (bytes[0]) {
 					case 'C':
 					case 'H':
@@ -461,6 +581,7 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 					case 's':
 					case 'u':
 					{
+						TRACE("Found interesting character!\n");
 						cSavedCharacter = bytes[0];
 						sMessage = *in;
 						toReturn = B_DISPATCH_MESSAGE;
@@ -480,30 +601,46 @@ EsperantoInputFilter::Filter(BMessage *in, BList *outList)
 				{
 					case '^':
 					{
+						TRACE("Found caret!\n");
+						TRACE("Saved character was "); TRACE(cSavedCharacter); TRACE("\n");
 						BMessage *pmBackSpace = this->pMessageB, 
 								 *pmNewCharacter;
 						switch (cSavedCharacter) {
-							case 'c': pmNewCharacter = pMessagec; break;
-							case 'C': pmNewCharacter = pMessageC; break;
-							case 'g': pmNewCharacter = pMessageg; break;
-							case 'G': pmNewCharacter = pMessageG; break;
-							case 'h': pmNewCharacter = pMessageh; break;
-							case 'H': pmNewCharacter = pMessageH; break;
-							case 'j': pmNewCharacter = pMessagej; break;
-							case 'J': pmNewCharacter = pMessageJ; break;
-							case 's': pmNewCharacter = pMessages; break;
-							case 'S': pmNewCharacter = pMessageS; break;
-							default:  pmNewCharacter = NULL; break;
+							case 'c': { pmNewCharacter = pMessagec; break; }
+							case 'C': { pmNewCharacter = pMessageC; break; }
+							case 'g': { pmNewCharacter = pMessageg; break; }
+							case 'G': { pmNewCharacter = pMessageG; break; }
+							case 'h': { pmNewCharacter = pMessageh; break; }
+							case 'H': { pmNewCharacter = pMessageH; break; }
+							case 'j': { pmNewCharacter = pMessagej; break; }
+							case 'J': { pmNewCharacter = pMessageJ; break; }
+							case 's': { pmNewCharacter = pMessages; break; }
+							case 'S': { pmNewCharacter = pMessageS; break; }
+							case 'u': { pmNewCharacter = pMessageu; break; }
+							case 'U': { pmNewCharacter = pMessageU; break; }
+							default:  { pmNewCharacter = NULL; break; }
 						}
-						if (!pmNewCharacter) { toReturn = B_DISPATCH_MESSAGE; break; }
+						if (!pmNewCharacter) {
+							TRACE("Did not find the message for the new character.\n");
+						}
+						if (!pmBackSpace) { 
+							TRACE("Did not find the message for the Backspace! Bailing out...\n");
+						}
+						if (!pmNewCharacter || !pmBackSpace) {
+							toReturn = B_DISPATCH_MESSAGE; 
+							break; 
+						}
 						
 						pmBackSpace->ReplaceInt64("when", real_time_clock_usecs());
 						//	pmBackSpace->ReplaceInt32("modifiers", modifiers);	<-- Are modifiers necessary?
  						outList->AddItem(pmBackSpace);
  						
+ 						TRACE("Adding Backspace to the list of messages to send.\n");
+ 						
  						pmNewCharacter->ReplaceInt64("when", real_time_clock_usecs());
  						pmNewCharacter->ReplaceInt32("modifiers", modifiers);	// Here probably they are.
  						outList->AddItem(pmNewCharacter);
+ 						TRACE("Adding the character with circumflex to the list of messages to send.\n");
  						
 						eCurrentState = STATE_2_CARET_RECEIVED;
 						toReturn = B_DISPATCH_MESSAGE;

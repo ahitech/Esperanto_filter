@@ -5,6 +5,9 @@
 #include <Font.h>
 #include <Rect.h>
 #include <String.h>
+#include <InputServerFilter.h>
+
+#include "../input_filter.cpp"
 
 
 AppView::AppView (BRect frame)

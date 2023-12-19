@@ -29,7 +29,7 @@ APP_MIME_SIG = application/x-vnd.hitech.scancode_printer
 #	same name (source.c or source.cpp) are included from different directories.
 #	Also note that spaces in folder names do not work well with this Makefile.
 SRCS =  Application.cpp	\
-		AppWindow.cpp
+		AppWindow.cpp 
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
@@ -55,14 +55,16 @@ RSRCS =
 #	- 	if your library does not follow the standard library naming scheme,
 #		you need to specify the path to the library and it's name.
 #		(e.g. for mylib.a, specify "mylib.a" or "path/mylib.a")
-LIBS =  /boot/system/lib/libbe.so /boot/system/lib/libsupc++.so
+LIBS =  /boot/system/lib/libbe.so 		\
+		/boot/system/lib/libsupc++.so	
 
 #	Specify additional paths to directories following the standard libXXX.so
 #	or libXXX.a naming scheme. You can specify full paths or paths relative
 #	to the Makefile. The paths included are not parsed recursively, so
 #	include all of the paths where libraries must be found. Directories where
 #	source files were specified are	automatically included.
-LIBPATHS =
+LIBPATHS =	\
+		/boot/home/Projects/Esperanto_filter/objects.x86_64-cc13-debug
 
 #	Additional paths to look for system headers. These use the form
 #	"#include <header>". Directories that contain the files in SRCS are
@@ -105,7 +107,7 @@ SYMBOLS :=
 DEBUGGER := TRUE
 
 #	Specify any additional compiler flags to be used.
-COMPILER_FLAGS =
+COMPILER_FLAGS = -fpermissive
 
 #	Specify any additional linker flags to be used.
 LINKER_FLAGS =
