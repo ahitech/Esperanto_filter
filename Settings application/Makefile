@@ -31,7 +31,8 @@ APP_MIME_SIG = application/x-vnd.hitech.EsperantoFilterSettings
 SRCS =  Application.cpp	\
 		AppWindow.cpp \
 		MainView.cpp \
-		SourceView.cpp
+		SourceView.cpp	\
+		SingleLetterView.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
@@ -82,7 +83,7 @@ LOCAL_INCLUDE_PATHS =  .
 
 #	Specify the level of optimization that you want. Specify either NONE (O0),
 #	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
-OPTIMIZE := FULL
+OPTIMIZE := NONE
 
 # 	Specify the codes for languages you are going to support in this
 # 	application. The default "en" one must be provided too. "make catkeys"
@@ -104,7 +105,7 @@ WARNINGS =
 
 #	With image symbols, stack crawls in the debugger are meaningful.
 #	If set to "TRUE", symbols will be created.
-SYMBOLS :=
+SYMBOLS := TRUE
 
 #	Includes debug information, which allows the binary to be debugged easily.
 #	If set to "TRUE", debug info will be created.

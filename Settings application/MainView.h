@@ -9,6 +9,8 @@
 
 #include <SupportDefs.h>
 
+#include "SingleLetterView.h"
+
 
 class MainView :
 	public BView

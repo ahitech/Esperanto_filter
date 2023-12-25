@@ -49,26 +49,61 @@ MainView::MainView (BRect frame)
 	BStringView* ĵLabel = new BStringView("ĵ Label", B_TRANSLATE("ĵ"));
 	BStringView* ŝLabel = new BStringView("ŝ Label", B_TRANSLATE("ŝ"));
 	BStringView* ŭLabel = new BStringView("ŭ Label", B_TRANSLATE("ŭ"));
-	BTextControl* ĉKey = new BTextControl("ĉ Substitute", "", " ", NULL);
-	BTextControl* ĝKey = new BTextControl("ĝ Substitute", "", " ", NULL);
-	BTextControl* ĵKey = new BTextControl("ĵ Substitute", "", " ", NULL);
-	BTextControl* ĥKey = new BTextControl("ĥ Substitute", "", " ", NULL);
-	BTextControl* ŝKey = new BTextControl("ŝ Substitute", "", " ", NULL);
-	BTextControl* ŭKey = new BTextControl("ŭ Substitute", "", " ", NULL);
+	
+	BRect glyphSize;
+	
+	
+	SingleLetterView* ĉKey = new SingleLetterView("ĉ Substitute");
+	SingleLetterView* ĝKey = new SingleLetterView("ĝ Substitute");
+	SingleLetterView* ĵKey = new SingleLetterView("ĵ Substitute");
+	SingleLetterView* ĥKey = new SingleLetterView("ĥ Substitute");
+	SingleLetterView* ŝKey = new SingleLetterView("ŝ Substitute");
+	SingleLetterView* ŭKey = new SingleLetterView("ŭ Substitute");
+	ĉKey->GetPreferredSize(&glyphSize);
+	BSize preferredSize(glyphSize.Width(), glyphSize.Height());
 	
 	directKeysLayout->AddView(ĉLabel, 1, 0);
-	directKeysLayout->AddView(ĉKey, 1, 1);
+	layoutItem = directKeysLayout->AddView(ĉKey, 1, 1);
+	layoutItem->SetExplicitMinSize(preferredSize);
+	layoutItem->SetExplicitMaxSize(preferredSize);
+	layoutItem->SetExplicitPreferredSize(preferredSize);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
 	directKeysLayout->AddView(ĝLabel, 2, 0);
-	directKeysLayout->AddView(ĝKey, 2, 1);
+	layoutItem = directKeysLayout->AddView(ĝKey, 2, 1);
+	layoutItem->SetExplicitMinSize(preferredSize);
+	layoutItem->SetExplicitMaxSize(preferredSize);
+	layoutItem->SetExplicitPreferredSize(preferredSize);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
 	directKeysLayout->AddView(ĥLabel, 3, 0);
-	directKeysLayout->AddView(ĥKey, 3, 1);
+	layoutItem = directKeysLayout->AddView(ĥKey, 3, 1);
+	layoutItem->SetExplicitMinSize(preferredSize);
+	layoutItem->SetExplicitMaxSize(preferredSize);
+	layoutItem->SetExplicitPreferredSize(preferredSize);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
 	directKeysLayout->AddView(ĵLabel, 4, 0);
-	directKeysLayout->AddView(ĵKey, 4, 1);
+	layoutItem = directKeysLayout->AddView(ĵKey, 4, 1);
+	layoutItem->SetExplicitMinSize(preferredSize);
+	layoutItem->SetExplicitMaxSize(preferredSize);
+	layoutItem->SetExplicitPreferredSize(preferredSize);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
 	directKeysLayout->AddView(ŝLabel, 5, 0);
-	directKeysLayout->AddView(ŝKey, 5, 1);
+	layoutItem = directKeysLayout->AddView(ŝKey, 5, 1);
+	layoutItem->SetExplicitMinSize(preferredSize);
+	layoutItem->SetExplicitMaxSize(preferredSize);
+	layoutItem->SetExplicitPreferredSize(preferredSize);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
 	directKeysLayout->AddView(ŭLabel, 6, 0);
-	directKeysLayout->AddView(ŭKey, 6, 1);
-	
+	layoutItem = directKeysLayout->AddView(ŭKey, 6, 1);
+	layoutItem->SetExplicitMinSize(preferredSize);
+	layoutItem->SetExplicitMaxSize(preferredSize);
+	layoutItem->SetExplicitPreferredSize(preferredSize);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
 		
 	
 	directKeysLayout->AddView(directKeysLabel, 0, 1);
