@@ -7,6 +7,7 @@
 #include <cctype>
 
 #include <InterfaceDefs.h>
+#include <Window.h>
 
 #define		INSET		3
 
@@ -17,12 +18,17 @@ SingleLetterView::SingleLetterView(const char* name, char letter = 0)
 	MakeResizable(false);
 	SetAlignment(B_ALIGN_CENTER);
 	SetStylable(false);	// We don't need styles here
-	SetMaxBytes(2);		// Max of 1 unicode character
+	SetMaxBytes(1);		// Max of 1 unicode character
 	if (letter != 0) { SetText(&letter, 1); }
 	SetWordWrap(false);
+	SetTabWidth(0);
 	ResizeToPreferred();
 	
-	KeyDown(&letter, 1);
+	if (letter) {
+		SetActive(false);
+	} else {
+		SetActive(true);
+	}
 }
 
 SingleLetterView::~SingleLetterView() { }	// Nothing to do here
@@ -30,11 +36,11 @@ SingleLetterView::~SingleLetterView() { }	// Nothing to do here
 
 void SingleLetterView::AttachedToWindow()
 {
-   if ( Parent() )
-   {
-//      SetViewColor(Parent()->ViewColor());
-   }
-   BView::AttachedToWindow();
+   	if ( Parent() )
+	{
+		Invalidate();
+	}
+	BView::AttachedToWindow();
 }
 
 
@@ -62,14 +68,33 @@ void SingleLetterView::GetPreferredSize(BRect* rect)
 		this->GetPreferredSize(&width, &height);
 		rect->Set(0, 0, width, height);
 	}	
-	
 }
 
+void SingleLetterView::MakeFocus(bool flag)
+{
+	if (!flag) {
+		char currentChar = GetCharacter();
+		if (!std::isalnum(currentChar)) {
+			SetActive(false);
+		}	
+	} else {			// The view became active
+		SetActive(true);
+	}	
+	BTextView::MakeFocus(flag);
+}
+
+void SingleLetterView::MouseDown(BPoint point)
+{
+//	SetViewColor(controlBackground);
+//	SetActive(true);
+	BTextView::MouseDown(point);
+}
 
 void SingleLetterView::ResizeToPreferred() {
 	float width = 0, height = 0;
 	this->GetPreferredSize(&width, &height);
 	this->ResizeTo(width, this->LineHeight());
+	this->SetTextRect(BRect(0, 0, width-1, height-1));
 }
 
 
@@ -82,11 +107,41 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 	if (numBytes == 1) {
 		SelectAll();
 		Delete();		// Clear old text
-		this->SetViewColor(linkHover);
-		if (bytes && std::isalnum(bytes[0])) {
-			BTextView::KeyDown(bytes, numBytes);
-			this->SetViewColor(controlBackground);
+//		this->SetViewColor(linkHover);
+		if (bytes) {
+			if (std::isalnum(bytes[0])) {
+				SetActive(true);
+			} else {
+				SetActive(false);
+			}
 		}
+		BTextView::KeyDown(bytes, numBytes);
+//			this->SetViewColor(controlBackground);
+	}
+}
+
+void SingleLetterView::SetActive(bool flag)
+{
+	// Basically, what I want to do is to draw a thick red line from the
+	// upper right corner of the control's frame to the bottom left corner
+	static rgb_color currentHighColor = HighColor();
+	static rgb_color transparent = ui_color(B_CONTROL_BACKGROUND_COLOR);
+//	if (Window()->LockLooper())
+	{
+		SetPenSize(3.0);		// The line is thick
+		SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
+		BRect bounds = Bounds();
+		BPoint upperRight(bounds.Width() - 2, 2);
+		BPoint bottomLeft(2, bounds.Height() - 2);
+		if (!flag) {			// Crossing out the window if it should NOT be active
+			SetHighColor(255, 0, 0);	// The line is red
+		} else {
+			SetHighColor(transparent);
+		}
+		StrokeLine(upperRight, bottomLeft);
+//		Window()->UpdateIfNeeded();
+		SetHighColor(currentHighColor);
+//		Window()->UnlockLooper();
 	}
 }
 

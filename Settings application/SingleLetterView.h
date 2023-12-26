@@ -21,13 +21,15 @@ public:
 	virtual void GetPreferredSize(float* width, float* height);
 	virtual void GetPreferredSize(BRect *rect);
 	virtual void ResizeToPreferred();
+	virtual void MakeFocus(bool flag = true);
+	virtual void MouseDown(BPoint point);
 	
 	virtual void AttachedToWindow();
 	// virtual void MessageReceived(BMessage* message);
 	virtual void KeyDown(const char* bytes, int32 numBytes);
 
 protected:
-
+	virtual void SetActive(bool flag = false);
 };
 
 
