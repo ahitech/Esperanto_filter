@@ -40,6 +40,7 @@ MainView::MainView (BRect frame)
     											
 	BGridLayout* directKeysLayout = new BGridLayout();
 	externalGroup->AddItem(directKeysLayout);
+	externalGroup->SetItemWeight(1, 0);
 	
 	BStringView* directKeysLabel = new BStringView("Direct Keys Label", 
 		B_TRANSLATE("Direct Keys:"));
@@ -61,6 +62,11 @@ MainView::MainView (BRect frame)
 	SingleLetterView* ŭKey = new SingleLetterView("ŭ Substitute");
 	ĉKey->GetPreferredSize(&glyphSize);
 	BSize preferredSize(glyphSize.Width(), glyphSize.Height());
+	
+	directKeysLayout->SetMaxRowHeight(0, glyphSize.Height());
+	directKeysLayout->SetMaxRowHeight(1, glyphSize.Height() + 5);
+	directKeysLayout->SetRowWeight(0, 0);
+	directKeysLayout->SetRowWeight(1, 0);
 	
 	directKeysLayout->AddView(ĉLabel, 1, 0);
 	layoutItem = directKeysLayout->AddView(ĉKey, 1, 1);

@@ -6,6 +6,7 @@
 
 #include <cctype>
 
+#include <InterfaceDefs.h>
 
 #define		INSET		3
 
@@ -20,6 +21,8 @@ SingleLetterView::SingleLetterView(const char* name, char letter = 0)
 	if (letter != 0) { SetText(&letter, 1); }
 	SetWordWrap(false);
 	ResizeToPreferred();
+	
+	KeyDown(&letter, 1);
 }
 
 SingleLetterView::~SingleLetterView() { }	// Nothing to do here
@@ -72,12 +75,18 @@ void SingleLetterView::ResizeToPreferred() {
 
 void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 {
+	rgb_color linkHover = ui_color(B_LINK_HOVER_COLOR),
+			  controlBackground = ui_color(B_CONTROL_BACKGROUND_COLOR);
+	
 	// The only allowed characters are the non-whitespace ones
-	if (numBytes == 1 && bytes && std::isalnum(bytes[0])) {
+	if (numBytes == 1) {
 		SelectAll();
 		Delete();		// Clear old text
-		
-		BTextView::KeyDown(bytes, numBytes);
+		this->SetViewColor(linkHover);
+		if (bytes && std::isalnum(bytes[0])) {
+			BTextView::KeyDown(bytes, numBytes);
+			this->SetViewColor(controlBackground);
+		}
 	}
 }
 
