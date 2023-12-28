@@ -30,6 +30,8 @@ public:
 
 protected:
 	virtual void SetActive(bool flag = false);
+	
+	BView*	internalView;
 };
 
 

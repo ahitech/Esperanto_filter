@@ -24,6 +24,8 @@ SingleLetterView::SingleLetterView(const char* name, char letter = 0)
 	SetTabWidth(0);
 	ResizeToPreferred();
 	
+	internalView = new BView(Bounds(), "Picture", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
+	
 	if (letter) {
 		SetActive(false);
 	} else {
