@@ -5,6 +5,7 @@
 #ifndef SINGLE_LETTER_VIEW_H
 #define SINGLE_LETTER_VIEW_H
 
+#include <Bitmap.h>
 #include <TextView.h>
 
 #include <SupportDefs.h>
@@ -32,6 +33,7 @@ protected:
 	virtual void SetActive(bool flag = false);
 	
 	BView*	internalView;
+	BBitmap* internalBitmap;
 };
 
 

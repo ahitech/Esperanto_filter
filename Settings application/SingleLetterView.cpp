@@ -6,13 +6,15 @@
 
 #include <cctype>
 
+
 #include <InterfaceDefs.h>
+#include <Region.h>
 #include <Window.h>
 
 #define		INSET		3
 
 
-SingleLetterView::SingleLetterView(const char* name, char letter = 0)
+SingleLetterView::SingleLetterView(const char* name, char letter)
 	: BTextView(name)
 {
 	MakeResizable(false);
@@ -24,7 +26,18 @@ SingleLetterView::SingleLetterView(const char* name, char letter = 0)
 	SetTabWidth(0);
 	ResizeToPreferred();
 	
-	internalView = new BView(Bounds(), "Picture", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
+	internalView = new BView(Bounds(), "Cross", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
+	internalBitmap = new BBitmap(Bounds(), B_RGBA32, B_TRANSPARENT, true, true);
+	if (internalBitmap && internalView) {
+		internalBitmap->SetBits()
+		internalBitmap->AddChild(internalView);
+		internalBitmap->Lock();
+			BRegion internalRegion(this->Bounds());
+			internalView->SetHighColor(B_TRANSPARENT_COLOR);
+			
+		
+		internalBitmap->Unlock();
+	}
 	
 	if (letter) {
 		SetActive(false);
@@ -111,13 +124,19 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 		Delete();		// Clear old text
 //		this->SetViewColor(linkHover);
 		if (bytes) {
+			if ((bytes[0] == B_BACKSPACE) ||
+				(bytes[0] == B_DELETE))
+			{
+				BTextView::KeyDown(bytes, numBytes);
+			}
 			if (std::isalnum(bytes[0])) {
 				SetActive(true);
+				BTextView::KeyDown(bytes, numBytes);
 			} else {
 				SetActive(false);
 			}
 		}
-		BTextView::KeyDown(bytes, numBytes);
+		
 //			this->SetViewColor(controlBackground);
 	}
 }
@@ -130,14 +149,16 @@ void SingleLetterView::SetActive(bool flag)
 	static rgb_color transparent = ui_color(B_CONTROL_BACKGROUND_COLOR);
 //	if (Window()->LockLooper())
 	{
-		SetPenSize(3.0);		// The line is thick
+		
 		SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
 		BRect bounds = Bounds();
 		BPoint upperRight(bounds.Width() - 2, 2);
 		BPoint bottomLeft(2, bounds.Height() - 2);
 		if (!flag) {			// Crossing out the window if it should NOT be active
+			SetPenSize(3.0);		// The line is thick
 			SetHighColor(255, 0, 0);	// The line is red
 		} else {
+			SetPenSize(5.0);		// The line is thick
 			SetHighColor(transparent);
 		}
 		StrokeLine(upperRight, bottomLeft);
