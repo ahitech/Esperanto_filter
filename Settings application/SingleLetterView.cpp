@@ -27,9 +27,9 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	ResizeToPreferred();
 	
 	internalView = new BView(Bounds(), "Cross", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
-	internalBitmap = new BBitmap(Bounds(), B_RGBA32, B_TRANSPARENT, true, true);
+	internalBitmap = new BBitmap(Bounds(), B_RGBA32, true, true);
 	if (internalBitmap && internalView) {
-		internalBitmap->SetBits()
+//		internalBitmap->SetBits()
 		internalBitmap->AddChild(internalView);
 		internalBitmap->Lock();
 			BRegion internalRegion(this->Bounds());
@@ -68,7 +68,7 @@ void SingleLetterView::GetPreferredSize(float *width, float *height)
 	{
 		usedFont.GetBoundingBoxesAsGlyphs("W",		// Widest character in western fonts
 					1, B_SCREEN_METRIC, rectangle);
-		*width = rectangle[0].Width() + 2*INSET;
+		*width = rectangle[0].Width();
 //		*height = rectangle[0].Height() + 2*INSET;
 		*height = this->LineHeight();
 	}
@@ -108,8 +108,8 @@ void SingleLetterView::MouseDown(BPoint point)
 void SingleLetterView::ResizeToPreferred() {
 	float width = 0, height = 0;
 	this->GetPreferredSize(&width, &height);
-	this->ResizeTo(width, this->LineHeight());
-	this->SetTextRect(BRect(0, 0, width-1, height-1));
+	this->ResizeTo(width + 2*INSET, this->LineHeight() + 2*INSET);
+	this->SetTextRect(BRect(1, 1, width-1, height-1));
 }
 
 
@@ -133,7 +133,7 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 				SetActive(true);
 				BTextView::KeyDown(bytes, numBytes);
 			} else {
-				SetActive(false);
+//				SetActive(false);
 			}
 		}
 		
@@ -159,7 +159,7 @@ void SingleLetterView::SetActive(bool flag)
 			SetHighColor(255, 0, 0);	// The line is red
 		} else {
 			SetPenSize(5.0);		// The line is thick
-			SetHighColor(transparent);
+			SetHighColor(255, 255, 255);
 		}
 		StrokeLine(upperRight, bottomLeft);
 //		Window()->UpdateIfNeeded();
