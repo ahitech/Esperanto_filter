@@ -23,14 +23,16 @@ public:
 	virtual void GetPreferredSize(BRect *rect);
 	virtual void ResizeToPreferred();
 	virtual void MakeFocus(bool flag = true);
-	virtual void MouseDown(BPoint point);
+	virtual void GoToLine(int32 index) { };
+//	virtual void Insert(const char *text, const text_run_array* runs = NULL);
+//	virtual void Paste(BClipboard* clipboard);
 	
 	virtual void AttachedToWindow();
 	// virtual void MessageReceived(BMessage* message);
 	virtual void KeyDown(const char* bytes, int32 numBytes);
+	virtual void SetActive(bool flag = false);
 
 protected:
-	virtual void SetActive(bool flag = false);
 	
 	BView*	internalView;
 	BBitmap* internalBitmap;

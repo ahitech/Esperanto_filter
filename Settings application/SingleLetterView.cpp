@@ -87,6 +87,7 @@ void SingleLetterView::GetPreferredSize(BRect* rect)
 
 void SingleLetterView::MakeFocus(bool flag)
 {
+	BTextView::MakeFocus(flag);
 	if (!flag) {
 		char currentChar = GetCharacter();
 		if (!std::isalnum(currentChar)) {
@@ -94,15 +95,8 @@ void SingleLetterView::MakeFocus(bool flag)
 		}	
 	} else {			// The view became active
 		SetActive(true);
-	}	
-	BTextView::MakeFocus(flag);
-}
-
-void SingleLetterView::MouseDown(BPoint point)
-{
-//	SetViewColor(controlBackground);
-//	SetActive(true);
-	BTextView::MouseDown(point);
+	}
+	BTextView::Invalidate();
 }
 
 void SingleLetterView::ResizeToPreferred() {
@@ -115,13 +109,11 @@ void SingleLetterView::ResizeToPreferred() {
 
 void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 {
-	rgb_color linkHover = ui_color(B_LINK_HOVER_COLOR),
-			  controlBackground = ui_color(B_CONTROL_BACKGROUND_COLOR);
-	
-	// The only allowed characters are the non-whitespace ones
-	if (numBytes == 1) {
 		SelectAll();
 		Delete();		// Clear old text
+
+	// The only allowed characters are the non-whitespace ones
+	if (numBytes == 1) {
 //		this->SetViewColor(linkHover);
 		if (bytes) {
 			if ((bytes[0] == B_BACKSPACE) ||
@@ -136,8 +128,6 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 //				SetActive(false);
 			}
 		}
-		
-//			this->SetViewColor(controlBackground);
 	}
 }
 
@@ -147,25 +137,22 @@ void SingleLetterView::SetActive(bool flag)
 	// upper right corner of the control's frame to the bottom left corner
 	static rgb_color currentHighColor = HighColor();
 	static rgb_color transparent = ui_color(B_CONTROL_BACKGROUND_COLOR);
-//	if (Window()->LockLooper())
-	{
-		
-		SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
-		BRect bounds = Bounds();
-		BPoint upperRight(bounds.Width() - 2, 2);
-		BPoint bottomLeft(2, bounds.Height() - 2);
-		if (!flag) {			// Crossing out the window if it should NOT be active
-			SetPenSize(3.0);		// The line is thick
-			SetHighColor(255, 0, 0);	// The line is red
-		} else {
-			SetPenSize(5.0);		// The line is thick
-			SetHighColor(255, 255, 255);
-		}
-		StrokeLine(upperRight, bottomLeft);
-//		Window()->UpdateIfNeeded();
-		SetHighColor(currentHighColor);
-//		Window()->UnlockLooper();
+			
+	SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
+	BRect bounds = Bounds();
+	BPoint upperRight(bounds.Width() - 2, 2);
+	BPoint bottomLeft(2, bounds.Height() - 2);
+	if (!flag) {			// Crossing out the window if it should NOT be active
+		SetPenSize(3.0);		// The line is thick
+		SetHighColor(255, 0, 0);	// The line is red
+		SelectAll();
+		Delete();
+	} else {
+		SetPenSize(5.0);		// The line is thick
+		SetHighColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	}
+	StrokeLine(upperRight, bottomLeft);
+	SetHighColor(currentHighColor);
 }
 
 char SingleLetterView::GetCharacter()
