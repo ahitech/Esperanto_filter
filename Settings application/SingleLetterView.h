@@ -36,6 +36,7 @@ protected:
 	
 	BView*	internalView;
 	BBitmap* internalBitmap;
+	bool	bViewBitmapIsSet;
 };
 
 

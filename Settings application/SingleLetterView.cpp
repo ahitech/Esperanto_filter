@@ -15,7 +15,10 @@
 
 
 SingleLetterView::SingleLetterView(const char* name, char letter)
-	: BTextView(name)
+	: BTextView(name),
+	  bViewBitmapIsSet(false),
+	  internalBitmap(NULL),
+	  internalView(NULL)
 {
 	MakeResizable(false);
 	SetAlignment(B_ALIGN_CENTER);
@@ -29,24 +32,42 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	internalView = new BView(Bounds(), "Cross", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
 	internalBitmap = new BBitmap(Bounds(), B_RGBA32, true, true);
 	if (internalBitmap && internalView) {
-//		internalBitmap->SetBits()
 		internalBitmap->AddChild(internalView);
-		internalBitmap->Lock();
+		if (internalBitmap->Lock())
+		{
 			BRegion internalRegion(this->Bounds());
-			internalView->SetHighColor(B_TRANSPARENT_COLOR);
-			
-		
-		internalBitmap->Unlock();
+			internalView->SetLowColor(0, 0, 0);
+			internalView->SetHighColor(255, 0, 0);
+			internalView->FillRegion(new BRegion(internalBitmap->Bounds()), B_SOLID_LOW);
+			BPoint upperRight(internalBitmap->Bounds().Width() - 2, 2);
+			BPoint bottomLeft(2, internalBitmap->Bounds().Height() - 2);
+			SetPenSize(3.0);		// The line is thick
+			internalView->StrokeLine(upperRight, bottomLeft);
+			internalView->Sync();
+			internalBitmap->Unlock();
+		}
+		internalBitmap->RemoveChild(internalView);
 	}
-	
-	if (letter) {
-		SetActive(false);
-	} else {
-		SetActive(true);
-	}
+
+//	if (letter) {
+//		SetActive(false);
+//	} else {
+//		SetActive(true);
+//	}
 }
 
-SingleLetterView::~SingleLetterView() { }	// Nothing to do here
+SingleLetterView::~SingleLetterView() {
+//	if (internalBitmap) { 
+//		if (bViewBitmapIsSet) ClearViewBitmap();
+//		delete (internalBitmap);
+//		internalBitmap = NULL;
+//	}
+//	if (internalView) {
+//		delete (internalView);
+//		internalView = NULL;
+//	}
+	
+}
 
 
 void SingleLetterView::AttachedToWindow()
@@ -135,6 +156,8 @@ void SingleLetterView::SetActive(bool flag)
 {
 	// Basically, what I want to do is to draw a thick red line from the
 	// upper right corner of the control's frame to the bottom left corner
+	
+#if 0	
 	static rgb_color currentHighColor = HighColor();
 	static rgb_color transparent = ui_color(B_CONTROL_BACKGROUND_COLOR);
 			
@@ -153,6 +176,18 @@ void SingleLetterView::SetActive(bool flag)
 	}
 	StrokeLine(upperRight, bottomLeft);
 	SetHighColor(currentHighColor);
+#endif
+
+	if (flag) {
+		if (this->bViewBitmapIsSet) {
+			this->ClearViewBitmap();
+			this->bViewBitmapIsSet = false;
+		}	
+	} else {
+		DrawBitmap(internalBitmap);
+		this->bViewBitmapIsSet = true;
+	}
+	
 }
 
 char SingleLetterView::GetCharacter()
