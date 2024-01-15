@@ -26,20 +26,20 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	SetTabWidth(0);
 	ResizeToPreferred();
 	
-	internalView = new BView(Bounds(), "Cross", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
-	internalBitmap = new BBitmap(Bounds(), B_RGBA32, true, true);
-	if (internalBitmap && internalView) {
-//		internalBitmap->SetBits()
-		internalBitmap->AddChild(internalView);
-		internalBitmap->Lock();
-			BRegion internalRegion(this->Bounds());
-			internalView->SetHighColor(B_TRANSPARENT_COLOR);
-			
-		
-		internalBitmap->Unlock();
-	}
+//	internalView = new BView(Bounds(), "Cross", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
+//	internalBitmap = new BBitmap(Bounds(), B_RGBA32, true, true);
+//	if (internalBitmap && internalView) {
+////		internalBitmap->SetBits()
+//		internalBitmap->AddChild(internalView);
+//		internalBitmap->Lock();
+//			BRegion internalRegion(this->Bounds());
+//			internalView->SetHighColor(B_TRANSPARENT_COLOR);
+//			
+//		
+//		internalBitmap->Unlock();
+//	}
 	
-	if (letter) {
+	if (!letter || !std::isalnum(letter)) {
 		SetActive(false);
 	} else {
 		SetActive(true);
@@ -68,7 +68,7 @@ void SingleLetterView::GetPreferredSize(float *width, float *height)
 	{
 		usedFont.GetBoundingBoxesAsGlyphs("W",		// Widest character in western fonts
 					1, B_SCREEN_METRIC, rectangle);
-		*width = rectangle[0].Width();
+		*width = rectangle[0].Width()* 2;
 //		*height = rectangle[0].Height() + 2*INSET;
 		*height = this->LineHeight();
 	}

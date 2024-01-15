@@ -68,48 +68,60 @@ MainView::MainView (BRect frame)
 	directKeysLayout->SetRowWeight(0, 0);
 	directKeysLayout->SetRowWeight(1, 0);
 	
-	directKeysLayout->AddView(ĉLabel, 1, 0);
+	layoutItem = directKeysLayout->AddView(ĉLabel, 1, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĉKey, 1, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
-	directKeysLayout->AddView(ĝLabel, 2, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
+	layoutItem = directKeysLayout->AddView(ĝLabel, 2, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĝKey, 2, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
-	directKeysLayout->AddView(ĥLabel, 3, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
+	layoutItem = directKeysLayout->AddView(ĥLabel, 3, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĥKey, 3, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
-	directKeysLayout->AddView(ĵLabel, 4, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
+	layoutItem = directKeysLayout->AddView(ĵLabel, 4, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĵKey, 4, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
-	directKeysLayout->AddView(ŝLabel, 5, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
+	layoutItem = directKeysLayout->AddView(ŝLabel, 5, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ŝKey, 5, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
-	directKeysLayout->AddView(ŭLabel, 6, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
+	layoutItem = directKeysLayout->AddView(ŭLabel, 6, 0);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ŭKey, 6, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+    											B_ALIGN_MIDDLE));
 		
 	
 	directKeysLayout->AddView(directKeysLabel, 0, 1);

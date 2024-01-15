@@ -32,7 +32,8 @@ SRCS =  Application.cpp	\
 		AppWindow.cpp \
 		MainView.cpp \
 		SourceView.cpp	\
-		SingleLetterView.cpp
+		SingleLetterView.cpp \
+		DirectKeysBox.cpp
 
 #	Specify the resource definition files to use. Full or relative paths can be
 #	used.
