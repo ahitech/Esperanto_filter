@@ -24,7 +24,8 @@ public:
 	virtual void ResizeToPreferred();
 	virtual void MakeFocus(bool flag = true);
 	virtual void MouseDown(BPoint point);
-	
+	virtual void SetEnabled(bool enabled);
+	inline virtual bool IsEnabled() { return enabled; }
 	virtual void AttachedToWindow();
 	// virtual void MessageReceived(BMessage* message);
 	virtual void KeyDown(const char* bytes, int32 numBytes);
@@ -34,6 +35,7 @@ protected:
 	
 	BView*	internalView;
 	BBitmap* internalBitmap;
+	bool		enabled;
 };
 
 

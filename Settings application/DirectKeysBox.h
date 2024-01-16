@@ -9,7 +9,7 @@
 #include <CheckBox.h>
 #include <SupportDefs.h>
 
-const uint32	BCHECKBOX_TOGGLED = 'BcbT';
+
 
 class DirectKeysBox : public BBox
 {
@@ -18,6 +18,7 @@ public:
 	virtual ~DirectKeysBox();
 	
 	virtual void MessageReceived(BMessage* in);
+	virtual void AttachedToWindow();
 
 protected:
 	BCheckBox* label;

@@ -13,9 +13,11 @@
 
 #define		INSET		3
 
+//	#pragma mark - Constructor and destructor
 
 SingleLetterView::SingleLetterView(const char* name, char letter)
-	: BTextView(name)
+	: BTextView(name),
+	  enabled(true)
 {
 	MakeResizable(false);
 	SetAlignment(B_ALIGN_CENTER);
@@ -48,6 +50,7 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 
 SingleLetterView::~SingleLetterView() { }	// Nothing to do here
 
+//	#pragma mark - Member functions
 
 void SingleLetterView::AttachedToWindow()
 {
@@ -171,4 +174,36 @@ void SingleLetterView::SetActive(bool flag)
 char SingleLetterView::GetCharacter()
 {
 	return (char )this->ByteAt(0);
+}
+
+void SingleLetterView::SetEnabled(bool enable) {
+	if (enabled == enable)
+		return;
+
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	rgb_color viewColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	BFont font;
+
+	GetFontAndColor(0, &font);
+
+	if (!enable) {
+		textColor = disable_color(textColor, ViewColor());
+		viewColor = disable_color(ViewColor(), viewColor);
+	}
+
+	SetFontAndColor(&font, B_FONT_ALL, &textColor);
+	SetViewColor(viewColor);
+	SetLowColor(viewColor);
+
+	if (Window() != NULL) {
+		MakeEditable(enable);
+		if (enable)
+			SetFlags(Flags() | B_NAVIGABLE);
+		else
+			SetFlags(Flags() & ~B_NAVIGABLE);
+		Invalidate();
+		Window()->UpdateIfNeeded();
+	}
+	
+	enabled = enable;
 }

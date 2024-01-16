@@ -5,6 +5,7 @@
 #ifndef MAIN_VIEW_H
 #define MAIN_VIEW_H
 
+#include <Box.h>
 #include <View.h>
 
 #include <SupportDefs.h>
@@ -20,9 +21,12 @@ public:
 	MainView (BRect);
 	~MainView ();
 	
-	void AttachedToWindow();
-private:
-
+	virtual void AttachedToWindow();
+	virtual void MessageReceived(BMessage* in);
+protected:
+	BBox* directBox;
+	
+	virtual void EnableDirectKeys(bool flag = false);
 
 };
 
