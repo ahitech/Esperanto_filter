@@ -9,6 +9,7 @@
 
 #include <SupportDefs.h>
 
+#include "DirectKeysBox.h"
 #include "SingleLetterView.h"
 
 

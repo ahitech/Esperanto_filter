@@ -37,10 +37,16 @@ MainView::MainView (BRect frame)
     											B_ALIGN_TOP));
     
     
-    											
+	DirectKeysBox* directBox = new DirectKeysBox("Box");
+	layoutItem = externalGroup->AddView(directBox);
+	layoutItem->SetExplicitAlignment(BAlignment(B_FOLLOW_LEFT_RIGHT, B_FOLLOW_TOP_BOTTOM));
+	
+/*    											
 	BGridLayout* directKeysLayout = new BGridLayout();
 	externalGroup->AddItem(directKeysLayout);
 	externalGroup->SetItemWeight(1, 0);
+	
+	
 	
 	BStringView* directKeysLabel = new BStringView("Direct Keys Label", 
 		B_TRANSLATE("Direct Keys:"));
@@ -69,63 +75,63 @@ MainView::MainView (BRect frame)
 	directKeysLayout->SetRowWeight(1, 0);
 	
 	layoutItem = directKeysLayout->AddView(ĉLabel, 1, 0);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĉKey, 1, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĝLabel, 2, 0);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĝKey, 2, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĥLabel, 3, 0);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĥKey, 3, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĵLabel, 4, 0);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ĵKey, 4, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ŝLabel, 5, 0);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ŝKey, 5, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ŭLabel, 6, 0);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 	layoutItem = directKeysLayout->AddView(ŭKey, 6, 1);
 	layoutItem->SetExplicitMinSize(preferredSize);
 	layoutItem->SetExplicitMaxSize(preferredSize);
 	layoutItem->SetExplicitPreferredSize(preferredSize);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
     											B_ALIGN_MIDDLE));
 		
 	
 	directKeysLayout->AddView(directKeysLabel, 0, 1);
-	
+*/	
 	
 }
 
