@@ -8,6 +8,7 @@
 #include <GroupLayout.h>
 #include <Layout.h>
 #include <LayoutBuilder.h>
+#include <Messenger.h>
 #include <StringView.h>
 #include <TextControl.h>
 
@@ -53,29 +54,49 @@ MainView::MainView (BRect frame)
 	SingleLetterView* ĥKey = new SingleLetterView("ĥ Substitute");
 	SingleLetterView* ŝKey = new SingleLetterView("ŝ Substitute");
 	SingleLetterView* ŭKey = new SingleLetterView("ŭ Substitute");
-    BStringView* directKeysLabel = new BStringView("Direct Keys Label", 
-		B_TRANSLATE("Direct Keys:"));
+	
+	BStringView* downArrow1 = new BStringView("Down arrow 1", "↓");
+	BStringView* downArrow2 = new BStringView("Down arrow 2", "↓");
+	BStringView* downArrow3 = new BStringView("Down arrow 3", "↓");
+	BStringView* downArrow4 = new BStringView("Down arrow 4", "↓");
+	BStringView* downArrow5 = new BStringView("Down arrow 5", "↓");
+	BStringView* downArrow6 = new BStringView("Down arrow 6", "↓");
+	
+    BStringView* substituteKeysLabel = new BStringView("Substitute Keys Label", 
+		B_TRANSLATE("Substitute these:"));
+	BStringView* directKeysLabel = new BStringView("Direct Keys Label", 
+		B_TRANSLATE("With these:"));
+	BStringView* caseLabel = new BStringView("Case label",
+		B_TRANSLATE("uppercase will\nbe converted\nto uppercase"));
+	caseLabel->SetAlignment(B_ALIGN_CENTER);
     
     directBox = new BBox(B_FANCY_BORDER,
 		BLayoutBuilder::Grid<>(5.0f, 5.0f)
-			.Add(directKeysLabel, 0, 1, 1, 2)
-			.Add(ĉLabel, 1, 0)
-			.Add(ĝLabel, 2, 0)
-			.Add(ĥLabel, 3, 0)
-			.Add(ĵLabel, 4, 0)
-			.Add(ŝLabel, 5, 0)
-			.Add(ŭLabel, 6, 0)
-			.Add(ĉKey, 1, 1)
-			.Add(ĝKey, 2, 1)
-			.Add(ĵKey, 3, 1)
-			.Add(ĥKey, 4, 1)
-			.Add(ŝKey, 5, 1)
-			.Add(ŭKey, 6, 1)
+			.Add(substituteKeysLabel, 0, 0)
+			.Add(caseLabel, 0, 1)
+			.Add(directKeysLabel, 0, 2)
+			.Add(ĉLabel, 1, 2)
+			.Add(ĝLabel, 2, 2)
+			.Add(ĥLabel, 3, 2)
+			.Add(ĵLabel, 4, 2)
+			.Add(ŝLabel, 5, 2)
+			.Add(ŭLabel, 6, 2)
+			.Add(downArrow1, 1, 1)
+			.Add(downArrow2, 2, 1)
+			.Add(downArrow3, 3, 1)
+			.Add(downArrow4, 4, 1)
+			.Add(downArrow5, 5, 1)
+			.Add(downArrow6, 6, 1)
+			.Add(ĉKey, 1, 0)
+			.Add(ĝKey, 2, 0)
+			.Add(ĵKey, 3, 0)
+			.Add(ĥKey, 4, 0)
+			.Add(ŝKey, 5, 0)
+			.Add(ŭKey, 6, 0)
 			.SetInsets(10.0f, 6.0f, 10.0f, 10.0f)
 			.View());
-    BCheckBox *label = new BCheckBox("BBox label",
-						  B_TRANSLATE("Use direct keys"),
-						  new BMessage(BCHECKBOX_TOGGLED));
+    BCheckBox *label = new BCheckBox(B_TRANSLATE("Use direct keys"),
+						  			 new BMessage(BCHECKBOX_TOGGLED));
 	label->SetValue(1);
 	directBox->SetLabel(label);
 	layoutItem = externalGroup->AddView(directBox);
@@ -88,17 +109,20 @@ MainView::MainView (BRect frame)
 	if (layout) {
 		for (int32 col = 1; col < layout->CountColumns(); ++col)
 		{
-			layout->ItemAt(col, 0)->SetExplicitAlignment(
+			layout->ItemAt(col, 2)->SetExplicitAlignment(
 							BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-			layout->ItemAt(col, 1)->SetExplicitMinSize(preferredSize);
-			layout->ItemAt(col, 1)->SetExplicitMaxSize(preferredSize);
-			layout->ItemAt(col, 1)->SetExplicitPreferredSize(preferredSize);
+			layout->ItemAt(col, 1)->SetExplicitAlignment(
+							BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+			layout->ItemAt(col, 0)->SetExplicitMinSize(preferredSize);
+			layout->ItemAt(col, 0)->SetExplicitMaxSize(preferredSize);
+			layout->ItemAt(col, 0)->SetExplicitPreferredSize(preferredSize);
 			layout->SetMaxColumnWidth(col, glyphSize.Width());
 			layout->SetColumnWeight(col, 0);
 		}
 		layout->SetColumnWeight(0, 1);
 		layout->SetMaxRowHeight(0, glyphSize.Height());
 		layout->SetMaxRowHeight(1, glyphSize.Height());
+		layout->SetMaxRowHeight(2, glyphSize.Height());
 		layout->InvalidateLayout();
 	}
 }
@@ -118,8 +142,8 @@ void MainView::EnableDirectKeys(bool flag)
 		SingleLetterView* pointer = NULL;
 		for (int32 col = 1; col < layout->CountColumns(); ++col)
 		{
-			pointer = dynamic_cast<SingleLetterView*>(layout->ItemAt(col, 1)->View());
-			if (pointer) pointer->MakeEditable(flag);
+			pointer = dynamic_cast<SingleLetterView*>(layout->ItemAt(col, 0)->View());
+			if (pointer) pointer->SetEnabled(flag);
 		}
 	}
 }
@@ -147,5 +171,13 @@ void MainView::AttachedToWindow()
 {
    if ( Parent() )
       SetViewColor(Parent()->ViewColor());
+      
+   BMessenger messenger(this);
+   
+   if (directBox) {
+	   BCheckBox* label = (BCheckBox*)directBox->LabelView();
+	   if (label) label->SetTarget(messenger);
+   }
+   
    BView::AttachedToWindow();
 }

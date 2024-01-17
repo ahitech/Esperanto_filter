@@ -27,25 +27,6 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	SetWordWrap(false);
 	SetTabWidth(0);
 	ResizeToPreferred();
-	
-//	internalView = new BView(Bounds(), "Cross", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS);
-//	internalBitmap = new BBitmap(Bounds(), B_RGBA32, true, true);
-//	if (internalBitmap && internalView) {
-////		internalBitmap->SetBits()
-//		internalBitmap->AddChild(internalView);
-//		internalBitmap->Lock();
-//			BRegion internalRegion(this->Bounds());
-//			internalView->SetHighColor(B_TRANSPARENT_COLOR);
-//			
-//		
-//		internalBitmap->Unlock();
-//	}
-	
-	if (!letter || !std::isalnum(letter)) {
-		SetActive(false);
-	} else {
-		SetActive(true);
-	}
 }
 
 SingleLetterView::~SingleLetterView() { }	// Nothing to do here
@@ -59,6 +40,9 @@ void SingleLetterView::AttachedToWindow()
 		Invalidate();
 	}
 	BView::AttachedToWindow();
+	
+	SetActive(GetCharacter() != 0);
+	Invalidate();
 }
 
 
@@ -90,6 +74,7 @@ void SingleLetterView::GetPreferredSize(BRect* rect)
 
 void SingleLetterView::MakeFocus(bool flag)
 {
+	if (!enabled) return;	// Don't accept focus if the view is disabled
 	if (!flag) {
 		char currentChar = GetCharacter();
 		if (!std::isalnum(currentChar)) {
@@ -125,6 +110,7 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 	if (numBytes == 1) {
 		SelectAll();
 		Delete();		// Clear old text
+		Invalidate();
 //		this->SetViewColor(linkHover);
 		if (bytes) {
 			if ((bytes[0] == B_BACKSPACE) ||
@@ -133,8 +119,11 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 				BTextView::KeyDown(bytes, numBytes);
 			}
 			if (std::isalnum(bytes[0])) {
+				char lowercase[2];
+				lowercase[0] = tolower(bytes[0]);
+				lowercase[1] = '\0';
 				SetActive(true);
-				BTextView::KeyDown(bytes, numBytes);
+				BTextView::KeyDown(lowercase, numBytes);
 			} else {
 //				SetActive(false);
 			}
@@ -148,9 +137,9 @@ void SingleLetterView::SetActive(bool flag)
 {
 	// Basically, what I want to do is to draw a thick red line from the
 	// upper right corner of the control's frame to the bottom left corner
+	if (GetCharacter()) return;
 	static rgb_color currentHighColor = HighColor();
-	static rgb_color transparent = ui_color(B_CONTROL_BACKGROUND_COLOR);
-//	if (Window()->LockLooper())
+	static rgb_color transparent = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	{
 		
 		SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
@@ -162,12 +151,10 @@ void SingleLetterView::SetActive(bool flag)
 			SetHighColor(255, 0, 0);	// The line is red
 		} else {
 			SetPenSize(5.0);		// The line is thick
-			SetHighColor(255, 255, 255);
+			SetHighColor(transparent);
 		}
 		StrokeLine(upperRight, bottomLeft);
-//		Window()->UpdateIfNeeded();
 		SetHighColor(currentHighColor);
-//		Window()->UnlockLooper();
 	}
 }
 
@@ -182,16 +169,17 @@ void SingleLetterView::SetEnabled(bool enable) {
 
 	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	rgb_color viewColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color bgColor   = ui_color(B_MENU_BACKGROUND_COLOR);
 	BFont font;
 
 	GetFontAndColor(0, &font);
 
 	if (!enable) {
 		textColor = disable_color(textColor, ViewColor());
-		viewColor = disable_color(ViewColor(), viewColor);
+		viewColor = disable_color(ViewColor(), bgColor);
 	}
 
-	SetFontAndColor(&font, B_FONT_ALL, &textColor);
+	SetFontAndColor(&font, 0, &textColor);
 	SetViewColor(viewColor);
 	SetLowColor(viewColor);
 
@@ -199,11 +187,15 @@ void SingleLetterView::SetEnabled(bool enable) {
 		MakeEditable(enable);
 		if (enable)
 			SetFlags(Flags() | B_NAVIGABLE);
-		else
+		else {
 			SetFlags(Flags() & ~B_NAVIGABLE);
+			MakeFocus(enable);
+		}
 		Invalidate();
 		Window()->UpdateIfNeeded();
 	}
+	
+	SetActive(GetCharacter() != 0);
 	
 	enabled = enable;
 }
