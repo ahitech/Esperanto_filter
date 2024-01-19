@@ -17,7 +17,9 @@
 
 SingleLetterView::SingleLetterView(const char* name, char letter)
 	: BTextView(name),
-	  enabled(true)
+	  enabled(true),
+	  internalView(NULL),
+	  internalBitmap(NULL)
 {
 	MakeResizable(false);
 	SetAlignment(B_ALIGN_CENTER);
@@ -32,6 +34,33 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 SingleLetterView::~SingleLetterView() { }	// Nothing to do here
 
 //	#pragma mark - Member functions
+void SingleLetterView::CreateBitmap(void)
+{
+	BRect bounds = Bounds(),
+		  smallRect = bounds.InsetBySelf(INSET, INSET);
+	internalBitmap = new BBitmap(bounds,
+								 B_RGB32, 
+								 true,		// Accept views
+								 false);	// Contiguous memory is not needed
+	internalView = new BView(smallRect, "Disabler", B_FOLLOW_NONE, B_WILL_DRAW);
+	
+	if (internalBitmap && internalView)
+	{
+		internalBitmap->AddChild(internalView);
+		internalView->SetLowColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
+		internalView->SetHighColor(255, 0, 0);
+		BRegion region(internalView->Bounds());
+		internalView->FillRegion(&region, B_SOLID_LOW);
+		BPoint upperRight(smallRect.Width(), 0);
+		BPoint bottomLeft(0, smallRect.Height());
+		internalView->SetPenSize(INSET);			// The line is thick
+		internalView->StrokeLine(upperRight, bottomLeft);
+		internalView->Sync();
+		
+		internalBitmap->RemoveChild(internalView);
+	}
+}
+
 
 void SingleLetterView::AttachedToWindow()
 {
@@ -125,11 +154,9 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 				SetActive(true);
 				BTextView::KeyDown(lowercase, numBytes);
 			} else {
-//				SetActive(false);
+				
 			}
 		}
-		
-//			this->SetViewColor(controlBackground);
 	}
 }
 
@@ -147,11 +174,11 @@ void SingleLetterView::SetActive(bool flag)
 		BPoint upperRight(bounds.Width() - 2, 2);
 		BPoint bottomLeft(2, bounds.Height() - 2);
 		if (!flag) {			// Crossing out the window if it should NOT be active
-			SetPenSize(3.0);		// The line is thick
+			SetPenSize(3.0);			// The line is thick
 			SetHighColor(255, 0, 0);	// The line is red
 		} else {
-			SetPenSize(5.0);		// The line is thick
-			SetHighColor(transparent);
+			SetPenSize(5.0);			// The line is thick
+			SetHighColor(transparent);	// The line is transparent
 		}
 		StrokeLine(upperRight, bottomLeft);
 		SetHighColor(currentHighColor);

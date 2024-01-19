@@ -32,6 +32,7 @@ public:
 
 protected:
 	virtual void SetActive(bool flag = false);
+	virtual void CreateBitmap(void);
 	
 	BView*	internalView;
 	BBitmap* internalBitmap;
