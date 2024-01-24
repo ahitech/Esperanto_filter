@@ -29,6 +29,7 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	SetWordWrap(false);
 	SetTabWidth(0);
 	ResizeToPreferred();
+	CreateBitmap();
 }
 
 SingleLetterView::~SingleLetterView() { }	// Nothing to do here
@@ -165,7 +166,14 @@ void SingleLetterView::SetActive(bool flag)
 	// Basically, what I want to do is to draw a thick red line from the
 	// upper right corner of the control's frame to the bottom left corner
 	if (GetCharacter()) return;
-	static rgb_color currentHighColor = HighColor();
+	
+	if (!flag) {
+		SetViewBitmap(internalBitmap);
+	} else {
+		ClearViewBitmap();
+	}
+	
+/*	static rgb_color currentHighColor = HighColor();
 	static rgb_color transparent = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	{
 		
@@ -183,6 +191,7 @@ void SingleLetterView::SetActive(bool flag)
 		StrokeLine(upperRight, bottomLeft);
 		SetHighColor(currentHighColor);
 	}
+*/	
 }
 
 char SingleLetterView::GetCharacter()
