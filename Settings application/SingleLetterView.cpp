@@ -32,14 +32,26 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	CreateBitmap();
 }
 
-SingleLetterView::~SingleLetterView() { }	// Nothing to do here
+SingleLetterView::~SingleLetterView() {
+	if (internalView) {
+		internalView->RemoveSelf();
+		delete internalView;
+		internalView = NULL;
+	}
+	if (internalBitmap)
+	{
+//		ClearViewBitmap();
+		delete internalBitmap;
+		internalBitmap = NULL;
+	}
+}
 
 //	#pragma mark - Member functions
 void SingleLetterView::CreateBitmap(void)
 {
 	BRect bounds = Bounds(),
 		  smallRect = bounds.InsetBySelf(INSET, INSET);
-	internalBitmap = new BBitmap(bounds,
+	internalBitmap = new BBitmap(smallRect,
 								 B_RGB32, 
 								 true,		// Accept views
 								 false);	// Contiguous memory is not needed
@@ -48,6 +60,7 @@ void SingleLetterView::CreateBitmap(void)
 	if (internalBitmap && internalView)
 	{
 		internalBitmap->AddChild(internalView);
+		internalBitmap->Lock();
 		internalView->SetLowColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
 		internalView->SetHighColor(255, 0, 0);
 		BRegion region(internalView->Bounds());
@@ -58,7 +71,9 @@ void SingleLetterView::CreateBitmap(void)
 		internalView->StrokeLine(upperRight, bottomLeft);
 		internalView->Sync();
 		
+		
 		internalBitmap->RemoveChild(internalView);
+		internalBitmap->Unlock();
 	}
 }
 
@@ -166,11 +181,12 @@ void SingleLetterView::SetActive(bool flag)
 	// Basically, what I want to do is to draw a thick red line from the
 	// upper right corner of the control's frame to the bottom left corner
 	if (GetCharacter()) return;
+	rgb_color background = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	
 	if (!flag) {
-		SetViewBitmap(internalBitmap);
+		SetViewOverlay(internalBitmap, &background);
 	} else {
-		ClearViewBitmap();
+		ClearViewOverlay();
 	}
 	
 /*	static rgb_color currentHighColor = HighColor();
