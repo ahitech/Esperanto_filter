@@ -71,7 +71,6 @@ void SingleLetterView::CreateBitmap(void)
 		internalView->StrokeLine(upperRight, bottomLeft);
 		internalView->Sync();
 		
-		
 		internalBitmap->RemoveChild(internalView);
 		internalBitmap->Unlock();
 	}
