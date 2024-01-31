@@ -23,7 +23,7 @@ public:
 	virtual void GetPreferredSize(BRect *rect);
 	virtual void ResizeToPreferred();
 	virtual void MakeFocus(bool flag = true);
-	virtual void MouseDown(BPoint point);
+	virtual void Draw(BRect updateRect);
 	virtual void SetEnabled(bool enabled);
 	inline virtual bool IsEnabled() { return enabled; }
 	virtual void AttachedToWindow();

@@ -130,12 +130,6 @@ void SingleLetterView::MakeFocus(bool flag)
 	BTextView::MakeFocus(flag);
 }
 
-void SingleLetterView::MouseDown(BPoint point)
-{
-//	SetViewColor(controlBackground);
-//	SetActive(true);
-	BTextView::MouseDown(point);
-}
 
 void SingleLetterView::ResizeToPreferred() {
 	float width = 0, height = 0;
@@ -182,13 +176,13 @@ void SingleLetterView::SetActive(bool flag)
 	if (GetCharacter()) return;
 	rgb_color background = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	
-	if (!flag) {
-		SetViewOverlay(internalBitmap, &background);
+/*	if (!flag) {
+		SetViewBitmap(internalBitmap); // , &background);
 	} else {
-		ClearViewOverlay();
+		ClearViewBitmap();
 	}
-	
-/*	static rgb_color currentHighColor = HighColor();
+*/	
+	static rgb_color currentHighColor = HighColor();
 	static rgb_color transparent = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	{
 		
@@ -206,7 +200,7 @@ void SingleLetterView::SetActive(bool flag)
 		StrokeLine(upperRight, bottomLeft);
 		SetHighColor(currentHighColor);
 	}
-*/	
+	
 }
 
 char SingleLetterView::GetCharacter()
@@ -249,4 +243,13 @@ void SingleLetterView::SetEnabled(bool enable) {
 	SetActive(GetCharacter() != 0);
 	
 	enabled = enable;
+}
+
+void SingleLetterView::Draw(BRect updateRect)
+{
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	SetHighColor(textColor);
+	BTextView::Draw(updateRect);
+	if (!IsFocus())
+		SetActive(this->GetCharacter() != 0);
 }
