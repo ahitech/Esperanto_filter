@@ -48,12 +48,12 @@ MainView::MainView (BRect frame)
 	BStringView* ŝLabel = new BStringView("ŝ Label", B_TRANSLATE("ŝ"));
 	BStringView* ŭLabel = new BStringView("ŭ Label", B_TRANSLATE("ŭ"));
 	
-	SingleLetterView* ĉKey = new SingleLetterView("ĉ Substitute"); ĉKey->ResizeToPreferred();
-	SingleLetterView* ĝKey = new SingleLetterView("ĝ Substitute");
-	SingleLetterView* ĵKey = new SingleLetterView("ĵ Substitute");
-	SingleLetterView* ĥKey = new SingleLetterView("ĥ Substitute");
-	SingleLetterView* ŝKey = new SingleLetterView("ŝ Substitute");
-	SingleLetterView* ŭKey = new SingleLetterView("ŭ Substitute");
+	ĉKey = new SingleLetterView("ĉ Substitute"); ĉKey->ResizeToPreferred();
+	ĝKey = new SingleLetterView("ĝ Substitute");
+	ĵKey = new SingleLetterView("ĵ Substitute");
+	ĥKey = new SingleLetterView("ĥ Substitute");
+	ŝKey = new SingleLetterView("ŝ Substitute");
+	ŭKey = new SingleLetterView("ŭ Substitute");
 	
 	BStringView* downArrow1 = new BStringView("Down arrow 1", "↓");
 	BStringView* downArrow2 = new BStringView("Down arrow 2", "↓");
@@ -180,4 +180,21 @@ void MainView::AttachedToWindow()
    }
    
    BView::AttachedToWindow();
+}
+
+
+bool MainView::CheckLetters(const char letter)
+{
+	if (letter == 0) return true;
+	uint8 counter = 0;
+	
+	if (ĉKey->GetCharacter() == letter) counter++;
+	if (ĝKey->GetCharacter() == letter) counter++;
+	if (ĥKey->GetCharacter() == letter) counter++;
+	if (ĵKey->GetCharacter() == letter) counter++;
+	if (ŝKey->GetCharacter() == letter) counter++;
+	if (ŭKey->GetCharacter() == letter) counter++;
+	
+	if (counter >= 2) return false;
+	else return true;
 }

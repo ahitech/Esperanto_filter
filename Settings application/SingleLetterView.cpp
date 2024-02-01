@@ -11,6 +11,8 @@
 #include <Region.h>
 #include <Window.h>
 
+#include "MainView.h"
+
 #define		INSET		3
 
 //	#pragma mark - Constructor and destructor
@@ -160,8 +162,10 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 				char lowercase[2];
 				lowercase[0] = tolower(bytes[0]);
 				lowercase[1] = '\0';
-				SetActive(true);
-				BTextView::KeyDown(lowercase, numBytes);
+				if (Parent() &&
+				    dynamic_cast<MainView*>(Parent())->CheckLetters(lowercase[0]))
+//				SetActive(true);
+					BTextView::KeyDown(lowercase, numBytes);
 			} else {
 				
 			}
