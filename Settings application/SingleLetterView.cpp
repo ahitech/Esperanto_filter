@@ -162,10 +162,28 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 				char lowercase[2];
 				lowercase[0] = tolower(bytes[0]);
 				lowercase[1] = '\0';
-				if (Parent() &&
-				    dynamic_cast<MainView*>(Parent())->CheckLetters(lowercase[0]))
-//				SetActive(true);
-					BTextView::KeyDown(lowercase, numBytes);
+				if (Parent())
+				{
+					SingleLetterView* SLVpointer = NULL;
+					BView* sibling = Parent()->ChildAt(0);
+					bool bSameLetterFound = false;
+					if (sibling) {
+						do {
+							SLVpointer = dynamic_cast<SingleLetterView*>(sibling);
+							if ((SLVpointer) &&
+								(sibling != this) &&
+								(SLVpointer->GetCharacter() == lowercase[0]))
+							{
+								bSameLetterFound = true;
+							}
+							sibling = sibling->NextSibling();
+						} while (!bSameLetterFound && sibling);
+					}
+					if (!bSameLetterFound)
+					{
+						BTextView::KeyDown(lowercase, numBytes);
+					}
+				}
 			} else {
 				
 			}

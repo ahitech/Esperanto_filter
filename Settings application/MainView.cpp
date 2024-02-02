@@ -182,19 +182,3 @@ void MainView::AttachedToWindow()
    BView::AttachedToWindow();
 }
 
-
-bool MainView::CheckLetters(const char letter)
-{
-	if (letter == 0) return true;
-	uint8 counter = 0;
-	
-	if (ĉKey->GetCharacter() == letter) counter++;
-	if (ĝKey->GetCharacter() == letter) counter++;
-	if (ĥKey->GetCharacter() == letter) counter++;
-	if (ĵKey->GetCharacter() == letter) counter++;
-	if (ŝKey->GetCharacter() == letter) counter++;
-	if (ŭKey->GetCharacter() == letter) counter++;
-	
-	if (counter >= 2) return false;
-	else return true;
-}

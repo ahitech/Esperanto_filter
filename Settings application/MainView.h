@@ -24,7 +24,6 @@ public:
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage* in);
 	
-	virtual bool CheckLetters(const char letter = 0);
 protected:
 	BBox* directBox;
 	
