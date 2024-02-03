@@ -27,15 +27,13 @@ public:
 	virtual void SetEnabled(bool enabled);
 	inline virtual bool IsEnabled() { return enabled; }
 	virtual void AttachedToWindow();
-	// virtual void MessageReceived(BMessage* message);
+	virtual void MessageReceived(BMessage* message);
 	virtual void KeyDown(const char* bytes, int32 numBytes);
 
 protected:
 	virtual void SetActive(bool flag = false);
-	virtual void CreateBitmap(void);
+	virtual void Flash();
 	
-	BView*	internalView;
-	BBitmap* internalBitmap;
 	bool		enabled;
 };
 

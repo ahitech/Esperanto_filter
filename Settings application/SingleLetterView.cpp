@@ -5,7 +5,8 @@
 #include "SingleLetterView.h"
 
 #include <cctype>
-
+#include <chrono>
+#include <thread>
 
 #include <InterfaceDefs.h>
 #include <Region.h>
@@ -15,13 +16,13 @@
 
 #define		INSET		3
 
+const uint32 FLASH = 'FLSH';
+
 //	#pragma mark - Constructor and destructor
 
 SingleLetterView::SingleLetterView(const char* name, char letter)
 	: BTextView(name),
-	  enabled(true),
-	  internalView(NULL),
-	  internalBitmap(NULL)
+	  enabled(true)
 {
 	MakeResizable(false);
 	SetAlignment(B_ALIGN_CENTER);
@@ -31,53 +32,15 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	SetWordWrap(false);
 	SetTabWidth(0);
 	ResizeToPreferred();
-	CreateBitmap();
 }
 
-SingleLetterView::~SingleLetterView() {
-	if (internalView) {
-		internalView->RemoveSelf();
-		delete internalView;
-		internalView = NULL;
-	}
-	if (internalBitmap)
-	{
-//		ClearViewBitmap();
-		delete internalBitmap;
-		internalBitmap = NULL;
-	}
-}
+SingleLetterView::~SingleLetterView() { }
 
 //	#pragma mark - Member functions
-void SingleLetterView::CreateBitmap(void)
+void SingleLetterView::MessageReceived(BMessage* in)
 {
-	BRect bounds = Bounds(),
-		  smallRect = bounds.InsetBySelf(INSET, INSET);
-	internalBitmap = new BBitmap(smallRect,
-								 B_RGB32, 
-								 true,		// Accept views
-								 false);	// Contiguous memory is not needed
-	internalView = new BView(smallRect, "Disabler", B_FOLLOW_NONE, B_WILL_DRAW);
-	
-	if (internalBitmap && internalView)
-	{
-		internalBitmap->AddChild(internalView);
-		internalBitmap->Lock();
-		internalView->SetLowColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
-		internalView->SetHighColor(255, 0, 0);
-		BRegion region(internalView->Bounds());
-		internalView->FillRegion(&region, B_SOLID_LOW);
-		BPoint upperRight(smallRect.Width(), 0);
-		BPoint bottomLeft(0, smallRect.Height());
-		internalView->SetPenSize(INSET);			// The line is thick
-		internalView->StrokeLine(upperRight, bottomLeft);
-		internalView->Sync();
-		
-		internalBitmap->RemoveChild(internalView);
-		internalBitmap->Unlock();
-	}
+	BTextView::MessageReceived(in);	
 }
-
 
 void SingleLetterView::AttachedToWindow()
 {
@@ -175,6 +138,7 @@ void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 								(SLVpointer->GetCharacter() == lowercase[0]))
 							{
 								bSameLetterFound = true;
+								SLVpointer->Flash();
 							}
 							sibling = sibling->NextSibling();
 						} while (!bSameLetterFound && sibling);
@@ -198,14 +162,9 @@ void SingleLetterView::SetActive(bool flag)
 	if (GetCharacter()) return;
 	rgb_color background = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	
-/*	if (!flag) {
-		SetViewBitmap(internalBitmap); // , &background);
-	} else {
-		ClearViewBitmap();
-	}
-*/	
-	static rgb_color currentHighColor = HighColor();
-	static rgb_color transparent = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color currentHighColor = HighColor();
+	rgb_color transparent = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	rgb_color lineColor = ui_color(B_FAILURE_COLOR);
 	{
 		
 		SetLineMode(B_ROUND_CAP, B_ROUND_JOIN);
@@ -214,7 +173,7 @@ void SingleLetterView::SetActive(bool flag)
 		BPoint bottomLeft(2, bounds.Height() - 2);
 		if (!flag) {			// Crossing out the window if it should NOT be active
 			SetPenSize(3.0);			// The line is thick
-			SetHighColor(255, 0, 0);	// The line is red
+			SetHighColor(lineColor);	// The line is of Failure color
 		} else {
 			SetPenSize(5.0);			// The line is thick
 			SetHighColor(transparent);	// The line is transparent
@@ -274,4 +233,21 @@ void SingleLetterView::Draw(BRect updateRect)
 	BTextView::Draw(updateRect);
 	if (!IsFocus())
 		SetActive(this->GetCharacter() != 0);
+}
+
+
+void SingleLetterView::Flash(void)
+{
+	rgb_color background = LowColor(),
+			  flash = ui_color(B_STATUS_BAR_COLOR);
+	this->SetLowColor(flash);
+	Invalidate();
+	Sync();
+	Parent()->Invalidate();
+/*	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	this->SetLowColor(background);
+	Invalidate();
+	Sync();
+	Parent()->Invalidate();
+*/	
 }
