@@ -7,7 +7,7 @@
 #include <cctype>
 #include <chrono>
 #include <thread>
-
+#include <OS.h>
 #include <InterfaceDefs.h>
 #include <Region.h>
 #include <Window.h>
@@ -90,6 +90,7 @@ void SingleLetterView::MakeFocus(bool flag)
 			SetActive(false);
 		}	
 	} else {			// The view became active
+		UnflashAll();
 		SetActive(true);
 	}	
 	BTextView::MakeFocus(flag);
@@ -106,6 +107,7 @@ void SingleLetterView::ResizeToPreferred() {
 
 void SingleLetterView::KeyDown(const char *bytes, int32 numBytes)
 {
+	UnflashAll();
 	rgb_color linkHover = ui_color(B_LINK_HOVER_COLOR),
 			  controlBackground = ui_color(B_CONTROL_BACKGROUND_COLOR);
 	
@@ -238,16 +240,36 @@ void SingleLetterView::Draw(BRect updateRect)
 
 void SingleLetterView::Flash(void)
 {
-	rgb_color background = LowColor(),
+	rgb_color background = ViewColor(),
 			  flash = ui_color(B_STATUS_BAR_COLOR);
-	this->SetLowColor(flash);
+	this->SetViewColor(flash);
 	Invalidate();
 	Sync();
 	Parent()->Invalidate();
-/*	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	this->SetLowColor(background);
+}
+
+void SingleLetterView::Unflash(void)
+{
+	rgb_color background = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	this->SetViewColor(background);
 	Invalidate();
 	Sync();
 	Parent()->Invalidate();
-*/	
+}
+
+void SingleLetterView::UnflashAll(void)
+{
+	if (!Parent()) return;		// Sanity check
+	SingleLetterView* SLVpointer = NULL;
+	BView* sibling = Parent()->ChildAt(0);
+
+	if (sibling) {
+		do {
+			SLVpointer = dynamic_cast<SingleLetterView*>(sibling);
+			if (SLVpointer) {
+				SLVpointer->Unflash();
+			}
+			sibling = sibling->NextSibling();
+		} while (sibling);
+	}
 }

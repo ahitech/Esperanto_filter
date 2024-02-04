@@ -36,10 +36,17 @@ MainView::MainView (BRect frame)
 	
 	BTextControl* postfixSymbols = new BTextControl("Postfix", 
 									B_TRANSLATE("Postfix symbols:"), "^", NULL);
+									
+	BCheckBox* autoŬ = new BCheckBox(B_TRANSLATE("Automatic ŭ after a, e"), NULL);
+
 	postfixSymbols->ResizeToPreferred();
 	
 	BLayoutItem* layoutItem = externalGroup->AddView(postfixSymbols);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
+    											B_ALIGN_TOP));
+    											
+	layoutItem = externalGroup->AddView(autoŬ);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
     											B_ALIGN_TOP));
     BStringView* ĉLabel = new BStringView("ĉ Label", B_TRANSLATE("ĉ"));
 	BStringView* ĝLabel = new BStringView("ĝ Label", B_TRANSLATE("ĝ"));

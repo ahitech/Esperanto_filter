@@ -33,6 +33,8 @@ public:
 protected:
 	virtual void SetActive(bool flag = false);
 	virtual void Flash();
+	virtual void Unflash();
+	virtual void UnflashAll();
 	
 	bool		enabled;
 };
