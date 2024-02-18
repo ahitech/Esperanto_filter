@@ -1,3 +1,5 @@
+#include <Layout.h>
+#include <Size.h>
 #include "Application.h"
 
 MainApp::MainApp ()
@@ -15,6 +17,11 @@ MainApp::~MainApp ()
 void MainApp::ReadyToRun() {
     window = new AppWindow();
     window->Show();
+    BLayout* layout = window->GetLayout();
+    if (layout) {
+    	BSize size = layout->PreferredSize();
+    	window->ResizeTo(size.Width(), size.Height());
+    }
 }
 
 

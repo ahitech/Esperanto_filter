@@ -23,6 +23,7 @@ const uint32	BCHECKBOX_TOGGLED 		= 'BcbT';
 const uint32	AUTO_STARTUP_TOGGLED 	= 'AsTg';
 const uint32	STARTUP_ACTIVE_TOGGLED 	= 'StAc';
 const uint32	AUTO_U_AFTER_A_E		= 'AuAE';
+const uint32	NEXT_POSTFIX_REMOVES_ACCENT	= 'NPRA';
 
 MainView::MainView (BRect frame)
 	: BView (frame, "main View",
@@ -49,16 +50,29 @@ MainView::MainView (BRect frame)
 
 	postfixSymbols->ResizeToPreferred();
 	
+	BCheckBox* nextPostfix = new BCheckBox("nextPostfix",
+		B_TRANSLATE("Next postfix symbol removes accent"),
+		new BMessage(NEXT_POSTFIX_REMOVES_ACCENT));
+	
 	BBox* textManipulation = new BBox(B_FANCY_BORDER,
 				BLayoutBuilder::Group<>(B_VERTICAL, 1.0f)
 					.SetInsets(10.0f, 4.0f, 5.0f, 4.0f)
 					.Add(postfixSymbols)
+					.Add(nextPostfix)
 					.Add(autoŬ)
 					.View());
 	BStringView* textManipulationLabel = new BStringView("text manipulation label",
 					B_TRANSLATE("Notation"));
 	textManipulation->SetLabel(textManipulationLabel);
 	externalGroup->AddView(textManipulation);
+	BGroupLayout* textLayout = dynamic_cast<BGroupLayout*>(textManipulation->ChildAt(1)->GetLayout());
+	if (textLayout) {
+		int32 index = textLayout->IndexOfView(nextPostfix);
+		BRect frame = textLayout->ItemAt(index)->Frame();
+		frame = frame.OffsetBySelf(20, 0);
+		textLayout->ItemAt(index)->SetFrame(frame);
+		textLayout->Relayout();
+	}
 	
 	BLayoutItem* layoutItem = NULL;
 	
