@@ -20,12 +20,15 @@
 #define B_TRANSLATION_CONTEXT "Main View"
 
 const uint32	BCHECKBOX_TOGGLED = 'BcbT';
+const uint32	AUTO_STARTUP_TOGGLED = 'AsTg';
+const uint32	STARTUP_ACTIVE_TOGGLED = 'StAc';
 
 MainView::MainView (BRect frame)
 	: BView (frame, "main View",
 			 B_FOLLOW_ALL_SIDES,
 			 B_WILL_DRAW | B_NAVIGABLE),
-	  directBox(NULL)
+	  directBox(NULL),
+	  startupSettings(NULL)
 {
 	this->SetViewColor (ui_color(B_MENU_BACKGROUND_COLOR));
 	
@@ -79,6 +82,7 @@ MainView::MainView (BRect frame)
     
     directBox = new BBox(B_FANCY_BORDER,
 		BLayoutBuilder::Grid<>(5.0f, 5.0f)
+			.SetInsets(10.0f, 0.0f, 5.0f, 0.0f)
 			.Add(substituteKeysLabel, 0, 0)
 			.Add(caseLabel, 0, 1)
 			.Add(directKeysLabel, 0, 2)
@@ -132,6 +136,21 @@ MainView::MainView (BRect frame)
 		layout->SetMaxRowHeight(2, glyphSize.Height());
 		layout->InvalidateLayout();
 	}
+	
+	// #pragma mark - Startup settings
+	BCheckBox* automaticStartup = new BCheckBox(
+			B_TRANSLATE("Startup with the system"),
+			new BMessage(AUTO_STARTUP_TOGGLED));
+	BCheckBox* startActive = new BCheckBox("startActive",
+			B_TRANSLATE("Start active"),
+			new BMessage(STARTUP_ACTIVE_TOGGLED));
+	startupSettings = new BBox(B_FANCY_BORDER,
+				BLayoutBuilder::Group<>(B_VERTICAL, 1.0f)
+					.SetInsets(10.0f, 4.0f, 5.0f, 4.0f)
+					.Add(startActive)
+					.View());
+	startupSettings->SetLabel(automaticStartup);
+	externalGroup->AddView(startupSettings);
 }
 
 
@@ -167,6 +186,16 @@ void MainView::MessageReceived(BMessage* in)
 			EnableDirectKeys(value);
 			
 			break;	
+		}
+		case (AUTO_STARTUP_TOGGLED):
+		{
+			bool value = (bool)(dynamic_cast<BCheckBox*>(startupSettings->LabelView())->Value());
+			EnableDirectKeys(value);
+//			BCheckBox* startActive = dynamic_cast<BCheckBox*>(startupSettings->FindView("startActive"));
+//			if (startActive) {
+//				startActive->SetEnabled(value);
+//			}
+			break;
 		}
 		default:
 			break;

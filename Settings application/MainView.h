@@ -26,6 +26,7 @@ public:
 	
 protected:
 	BBox* directBox;
+	BBox* startupSettings;
 	
 	virtual void EnableDirectKeys(bool flag = false);
 
