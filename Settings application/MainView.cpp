@@ -19,16 +19,19 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Main View"
 
-const uint32	BCHECKBOX_TOGGLED = 'BcbT';
-const uint32	AUTO_STARTUP_TOGGLED = 'AsTg';
-const uint32	STARTUP_ACTIVE_TOGGLED = 'StAc';
+const uint32	BCHECKBOX_TOGGLED 		= 'BcbT';
+const uint32	AUTO_STARTUP_TOGGLED 	= 'AsTg';
+const uint32	STARTUP_ACTIVE_TOGGLED 	= 'StAc';
+const uint32	AUTO_U_AFTER_A_E		= 'AuAE';
 
 MainView::MainView (BRect frame)
 	: BView (frame, "main View",
 			 B_FOLLOW_ALL_SIDES,
 			 B_WILL_DRAW | B_NAVIGABLE),
 	  directBox(NULL),
-	  startupSettings(NULL)
+	  startupSettings(NULL),
+	  bUseDirectKeys(false),			// TODO: This should be read from the settings
+	  bStartupWithTheSystem(false)		// TODO: This should be read from the settings
 {
 	this->SetViewColor (ui_color(B_MENU_BACKGROUND_COLOR));
 	
@@ -40,17 +43,26 @@ MainView::MainView (BRect frame)
 	BTextControl* postfixSymbols = new BTextControl("Postfix", 
 									B_TRANSLATE("Postfix symbols:"), "^", NULL);
 									
-	BCheckBox* autoŬ = new BCheckBox(B_TRANSLATE("Automatic ŭ after a, e"), NULL);
+	BCheckBox* autoŬ = new BCheckBox("autoU",
+		B_TRANSLATE("Automatic ŭ after a, e"),
+		new BMessage(AUTO_U_AFTER_A_E));
 
 	postfixSymbols->ResizeToPreferred();
 	
-	BLayoutItem* layoutItem = externalGroup->AddView(postfixSymbols);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
-    											
-	layoutItem = externalGroup->AddView(autoŬ);
-	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
-    											B_ALIGN_TOP));
+	BBox* textManipulation = new BBox(B_FANCY_BORDER,
+				BLayoutBuilder::Group<>(B_VERTICAL, 1.0f)
+					.SetInsets(10.0f, 4.0f, 5.0f, 4.0f)
+					.Add(postfixSymbols)
+					.Add(autoŬ)
+					.View());
+	BStringView* textManipulationLabel = new BStringView("text manipulation label",
+					B_TRANSLATE("Notation"));
+	textManipulation->SetLabel(textManipulationLabel);
+	externalGroup->AddView(textManipulation);
+	
+	BLayoutItem* layoutItem = NULL;
+	
+	// Direct keys	
     BStringView* ĉLabel = new BStringView("ĉ Label", B_TRANSLATE("ĉ"));
 	BStringView* ĝLabel = new BStringView("ĝ Label", B_TRANSLATE("ĝ"));
 	BStringView* ĥLabel = new BStringView("ĥ Label", B_TRANSLATE("ĥ"));
@@ -108,7 +120,10 @@ MainView::MainView (BRect frame)
 			.View());
     BCheckBox *label = new BCheckBox(B_TRANSLATE("Use direct keys"),
 						  			 new BMessage(BCHECKBOX_TOGGLED));
-	label->SetValue(1);
+						  			 
+	// Here the value of the Direct Keys substitution is set according
+	// to the settings
+	label->SetValue(bUseDirectKeys ? 1 : 0);
 	directBox->SetLabel(label);
 	layoutItem = externalGroup->AddView(directBox);
 	
@@ -137,7 +152,7 @@ MainView::MainView (BRect frame)
 		layout->InvalidateLayout();
 	}
 	
-	// #pragma mark - Startup settings
+	// Startup settings
 	BCheckBox* automaticStartup = new BCheckBox(
 			B_TRANSLATE("Startup with the system"),
 			new BMessage(AUTO_STARTUP_TOGGLED));
@@ -150,7 +165,19 @@ MainView::MainView (BRect frame)
 					.Add(startActive)
 					.View());
 	startupSettings->SetLabel(automaticStartup);
+	automaticStartup->SetValue(true);
 	externalGroup->AddView(startupSettings);
+	
+	// Explanation string
+	BStringView* explanation = new BStringView("explanation",
+		B_TRANSLATE("No need to save,\nthe changes are applied immediately"));
+	layoutItem = externalGroup->AddView(explanation);
+	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+	
+	// Test area
+	BTextControl* testArea = new BTextControl("test area", 
+				B_TRANSLATE("Test your Esperanto input:"), "", NULL);
+	externalGroup->AddView(testArea);
 }
 
 
@@ -190,11 +217,10 @@ void MainView::MessageReceived(BMessage* in)
 		case (AUTO_STARTUP_TOGGLED):
 		{
 			bool value = (bool)(dynamic_cast<BCheckBox*>(startupSettings->LabelView())->Value());
-			EnableDirectKeys(value);
-//			BCheckBox* startActive = dynamic_cast<BCheckBox*>(startupSettings->FindView("startActive"));
-//			if (startActive) {
-//				startActive->SetEnabled(value);
-//			}
+			BCheckBox* startActive = dynamic_cast<BCheckBox*>(startupSettings->FindView("startActive"));
+			if (startActive) {
+				startActive->SetEnabled(value);
+			}
 			break;
 		}
 		default:
@@ -209,11 +235,22 @@ void MainView::AttachedToWindow()
       SetViewColor(Parent()->ViewColor());
       
    BMessenger messenger(this);
+   BCheckBox*	checkBox = NULL;
    
    if (directBox) {
-	   BCheckBox* label = (BCheckBox*)directBox->LabelView();
-	   if (label) label->SetTarget(messenger);
+	   checkBox = (BCheckBox*)directBox->LabelView();
+	   if (checkBox) checkBox->SetTarget(messenger);
+	   EnableDirectKeys(bUseDirectKeys);
    }
+   
+   if (startupSettings) {
+   		checkBox = (BCheckBox*)startupSettings->LabelView();
+   		if (checkBox) checkBox->SetTarget(messenger);
+   }
+   
+   checkBox = (BCheckBox*)FindView("autoU");
+   if (checkBox != NULL) checkBox->SetTarget(messenger);
+   		
    
    BView::AttachedToWindow();
 }

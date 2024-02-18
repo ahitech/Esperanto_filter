@@ -36,6 +36,9 @@ protected:
 	SingleLetterView* ĥKey;
 	SingleLetterView* ŝKey;
 	SingleLetterView* ŭKey;
+	
+	bool bUseDirectKeys;
+	bool bStartupWithTheSystem;
 };
 
 
