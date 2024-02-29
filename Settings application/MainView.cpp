@@ -24,6 +24,7 @@ const uint32	AUTO_STARTUP_TOGGLED 	= 'AsTg';
 const uint32	STARTUP_ACTIVE_TOGGLED 	= 'StAc';
 const uint32	AUTO_U_AFTER_A_E		= 'AuAE';
 const uint32	NEXT_POSTFIX_REMOVES_ACCENT	= 'NPRA';
+const uint32	INSTALL_IN_DESKBAR		= 'Dskb';
 
 MainView::MainView (BRect frame)
 	: BView (frame, "main View",
@@ -130,7 +131,8 @@ MainView::MainView (BRect frame)
 			.Add(ĥKey, 4, 0)
 			.Add(ŝKey, 5, 0)
 			.Add(ŭKey, 6, 0)
-			.SetInsets(10.0f, 6.0f, 10.0f, 10.0f)
+//			.AddGlue(1, 1, 1, 1)
+//			.SetInsets(10.0f, 6.0f, 10.0f, 10.0f)
 			.View());
     BCheckBox *label = new BCheckBox(B_TRANSLATE("Use direct keys"),
 						  			 new BMessage(BCHECKBOX_TOGGLED));
@@ -159,7 +161,7 @@ MainView::MainView (BRect frame)
 			layout->SetMaxColumnWidth(col, glyphSize.Width());
 			layout->SetColumnWeight(col, 0);
 		}
-		layout->SetColumnWeight(0, 1);
+		layout->SetColumnWeight(0, 0);
 		layout->SetMaxRowHeight(0, glyphSize.Height());
 		layout->SetMaxRowHeight(1, glyphSize.Height());
 		layout->SetMaxRowHeight(2, glyphSize.Height());
@@ -168,11 +170,17 @@ MainView::MainView (BRect frame)
 	
 	// Startup settings
 	BCheckBox* automaticStartup = new BCheckBox(
-			B_TRANSLATE("Startup with the system"),
+			"autoStart",
+			B_TRANSLATE("Start the program with the system"),
 			new BMessage(AUTO_STARTUP_TOGGLED));
-	BCheckBox* startActive = new BCheckBox("startActive",
+	BCheckBox* startActive = new BCheckBox(
+			"startActive",
 			B_TRANSLATE("Start active"),
 			new BMessage(STARTUP_ACTIVE_TOGGLED));
+	BCheckBox* installInDeskbar = new BCheckBox(
+			"InstallInDeskbar",
+			B_TRANSLATE("Install in Deskbar"),
+			new BMessage(INSTALL_IN_DESKBAR));
 	startupSettings = new BBox(B_FANCY_BORDER,
 				BLayoutBuilder::Group<>(B_VERTICAL, 1.0f)
 					.SetInsets(10.0f, 4.0f, 5.0f, 4.0f)
@@ -181,6 +189,7 @@ MainView::MainView (BRect frame)
 	startupSettings->SetLabel(automaticStartup);
 	automaticStartup->SetValue(true);
 	externalGroup->AddView(startupSettings);
+	externalGroup->AddView(installInDeskbar);
 	
 	// Explanation string
 	BStringView* explanation = new BStringView("explanation",
@@ -263,6 +272,9 @@ void MainView::AttachedToWindow()
    }
    
    checkBox = (BCheckBox*)FindView("autoU");
+   if (checkBox != NULL) checkBox->SetTarget(messenger);
+   
+   checkBox = (BCheckBox*)FindView("InstallInDeskbar");
    if (checkBox != NULL) checkBox->SetTarget(messenger);
    		
    

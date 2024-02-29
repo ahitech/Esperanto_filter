@@ -11,7 +11,7 @@ AppWindow::AppWindow () :
 	BWindow (BRect (100, 100, 500, 500),
 			 "Esperanto Filter",
 			 B_TITLED_WINDOW,
-			 B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS)
+			 B_ASYNCHRONOUS_CONTROLS)
 {
 	mainView = new MainView (Bounds());
 	AddChild (mainView);
