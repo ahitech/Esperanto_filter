@@ -2,6 +2,8 @@
  * Copyright 2024, Alex Hitech <ahitech@gmail.com>
  * All rights reserved. Distributed under the terms of the MIT license.
  */
+ 
+#include <stdio.h>
 
 #include <Catalog.h>
 #include <GridLayout.h>
@@ -143,6 +145,7 @@ MainView::MainView (BRect frame)
 	directBox->SetLabel(label);
 	layoutItem = externalGroup->AddView(directBox);
 	
+	
 	BRect glyphSize;
 	ĉKey->GetPreferredSize(&glyphSize);
 	BSize preferredSize(glyphSize.Width(), glyphSize.Height());
@@ -155,18 +158,40 @@ MainView::MainView (BRect frame)
 							BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
 			layout->ItemAt(col, 1)->SetExplicitAlignment(
 							BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-			layout->ItemAt(col, 0)->SetExplicitMinSize(preferredSize);
-			layout->ItemAt(col, 0)->SetExplicitMaxSize(preferredSize);
-			layout->ItemAt(col, 0)->SetExplicitPreferredSize(preferredSize);
+//			layout->ItemAt(col, 0)->SetExplicitMinSize(preferredSize);
+//			layout->ItemAt(col, 0)->SetExplicitMaxSize(preferredSize);
+//			layout->ItemAt(col, 0)->SetExplicitPreferredSize(preferredSize);
 			layout->SetMaxColumnWidth(col, glyphSize.Width());
-			layout->SetColumnWeight(col, 0);
+			if (col != 0)
+				layout->SetColumnWeight(col, 0);
 		}
-		layout->SetColumnWeight(0, 0);
+//		layout->SetColumnWeight(0, 0);
 		layout->SetMaxRowHeight(0, glyphSize.Height());
 		layout->SetMaxRowHeight(1, glyphSize.Height());
 		layout->SetMaxRowHeight(2, glyphSize.Height());
 		layout->InvalidateLayout();
 	}
+
+	FILE* log = fopen("/boot/home/log.txt", "w");
+	BRect layoutItemRect;
+	layout = dynamic_cast <BGridLayout*>(directBox->ChildAt(1)->GetLayout());
+	if (layout) {
+		for (int32 col = 0; col < layout->CountColumns(); ++col)
+		{
+			for (int32 row = 0; row < layout->CountRows(); ++row)
+			{
+				layoutItem = layout->ItemAt(col, row);
+				layoutItemRect = layoutItem->Frame();
+				
+				fprintf(log, "Item at row %d, col %d has width of %.2f.\n",
+						row, col, layoutItemRect.Width());
+			}
+		}
+	}
+	
+	fclose(log);
+	
+
 	
 	// Startup settings
 	BCheckBox* automaticStartup = new BCheckBox(

@@ -24,7 +24,7 @@ SingleLetterView::SingleLetterView(const char* name, char letter)
 	: BTextView(name),
 	  enabled(true)
 {
-	MakeResizable(false);
+	MakeResizable(true);
 	SetAlignment(B_ALIGN_CENTER);
 	SetStylable(false);	// We don't need styles here
 	SetMaxBytes(1);		// Max of 1 unicode character
@@ -64,7 +64,7 @@ void SingleLetterView::GetPreferredSize(float *width, float *height)
 	{
 		usedFont.GetBoundingBoxesAsGlyphs("W",		// Widest character in western fonts
 					1, B_SCREEN_METRIC, rectangle);
-		*width = rectangle[0].Width()* 2;
+		*width = rectangle[0].Width() + 2;
 //		*height = rectangle[0].Height() + 2*INSET;
 		*height = this->LineHeight();
 	}
