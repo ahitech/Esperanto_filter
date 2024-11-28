@@ -59,14 +59,18 @@ void SingleLetterView::GetPreferredSize(float *width, float *height)
 {
 	BFont usedFont;
 	GetFontAndColor(0, &usedFont);
-	BRect rectangle[2];
+	BRect rectangle;
+	
+//	*width = 20;
+//	*height = this->LineHeight();
+
 	if (width && height)
 	{
 		usedFont.GetBoundingBoxesAsGlyphs("W",		// Widest character in western fonts
-					1, B_SCREEN_METRIC, rectangle);
-		*width = rectangle[0].Width() + 2;
-//		*height = rectangle[0].Height() + 2*INSET;
-		*height = this->LineHeight();
+					1, B_SCREEN_METRIC, &rectangle);
+		*width = rectangle.Width() + 2*INSET;
+		*height = rectangle.Height() + 2*INSET;
+//		*height = this->LineHeight();
 	}
 }
 
@@ -100,7 +104,9 @@ void SingleLetterView::MakeFocus(bool flag)
 void SingleLetterView::ResizeToPreferred() {
 	float width = 0, height = 0;
 	this->GetPreferredSize(&width, &height);
-	this->ResizeTo(width + 2*INSET, this->LineHeight() + 2*INSET);
+//	this->ResizeTo(width + 2*INSET, this->LineHeight() + 2*INSET);
+
+	printf ("The size is %.2f x %.2f.\n", width, height);
 	this->SetTextRect(BRect(1, 1, width-1, height-1));
 }
 

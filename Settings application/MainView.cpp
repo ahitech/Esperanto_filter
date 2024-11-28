@@ -26,6 +26,7 @@ const uint32	AUTO_STARTUP_TOGGLED 	= 'AsTg';
 const uint32	STARTUP_ACTIVE_TOGGLED 	= 'StAc';
 const uint32	AUTO_U_AFTER_A_E		= 'AuAE';
 const uint32	NEXT_POSTFIX_REMOVES_ACCENT	= 'NPRA';
+const uint32	NEXT_PREFIX_REMOVES_ACCENT	= 'NpRA';
 const uint32	INSTALL_IN_DESKBAR		= 'Dskb';
 
 MainView::MainView (BRect frame)
@@ -45,9 +46,9 @@ MainView::MainView (BRect frame)
 	this->SetLayout(externalGroup);
 	
 	BTextControl* postfixSymbols = new BTextControl("Postfix", 
-									B_TRANSLATE("Postfix symbols:"), "^", NULL);
-									
-	BCheckBox* autoŬ = new BCheckBox("autoU",
+									B_TRANSLATE("Postfix symbols:"), "^x", NULL);
+	BTextControl* prefixSymbols = new BTextControl("Prefix", 
+									B_TRANSLATE("Prefix symbols:"), "", NULL);		BCheckBox* autoŬ = new BCheckBox("autoU",
 		B_TRANSLATE("Automatic ŭ after a, e"),
 		new BMessage(AUTO_U_AFTER_A_E));
 
@@ -56,12 +57,18 @@ MainView::MainView (BRect frame)
 	BCheckBox* nextPostfix = new BCheckBox("nextPostfix",
 		B_TRANSLATE("Next postfix symbol removes accent"),
 		new BMessage(NEXT_POSTFIX_REMOVES_ACCENT));
+		
+	BCheckBox* nextPrefix = new BCheckBox("nextPrefix",
+		B_TRANSLATE("Next prefix symbol removes accent"),
+		new BMessage(NEXT_PREFIX_REMOVES_ACCENT));
 	
 	BBox* textManipulation = new BBox(B_FANCY_BORDER,
 				BLayoutBuilder::Group<>(B_VERTICAL, 1.0f)
 					.SetInsets(10.0f, 4.0f, 5.0f, 4.0f)
 					.Add(postfixSymbols)
 					.Add(nextPostfix)
+					.Add(prefixSymbols)
+					.Add(nextPrefix)
 					.Add(autoŬ)
 					.View());
 	BStringView* textManipulationLabel = new BStringView("text manipulation label",
@@ -87,7 +94,7 @@ MainView::MainView (BRect frame)
 	BStringView* ŝLabel = new BStringView("ŝ Label", B_TRANSLATE("ŝ"));
 	BStringView* ŭLabel = new BStringView("ŭ Label", B_TRANSLATE("ŭ"));
 	
-	ĉKey = new SingleLetterView("ĉ Substitute"); ĉKey->ResizeToPreferred();
+	ĉKey = new SingleLetterView("ĉ Substitute"); // ĉKey->ResizeToPreferred();
 	ĝKey = new SingleLetterView("ĝ Substitute");
 	ĵKey = new SingleLetterView("ĵ Substitute");
 	ĥKey = new SingleLetterView("ĥ Substitute");
@@ -103,6 +110,9 @@ MainView::MainView (BRect frame)
 	
     BStringView* substituteKeysLabel = new BStringView("Substitute Keys Label", 
 		B_TRANSLATE("Substitute these:"));
+	BRect substituteKeysLabelFrame = substituteKeysLabel->Frame();
+	
+		
 	BStringView* directKeysLabel = new BStringView("Direct Keys Label", 
 		B_TRANSLATE("With these:"));
 	BStringView* caseLabel = new BStringView("Case label",
@@ -133,8 +143,11 @@ MainView::MainView (BRect frame)
 			.Add(ĥKey, 4, 0)
 			.Add(ŝKey, 5, 0)
 			.Add(ŭKey, 6, 0)
+			.Add(new BStringView("Stam", " "), 7, 0)
+			.Add(new BStringView("Stam1", " "), 7, 1)
+			.Add(new BStringView("Stam2", " "), 7, 2)
 //			.AddGlue(1, 1, 1, 1)
-//			.SetInsets(10.0f, 6.0f, 10.0f, 10.0f)
+			.SetInsets(10.0f, 6.0f, 10.0f, 10.0f)
 			.View());
     BCheckBox *label = new BCheckBox(B_TRANSLATE("Use direct keys"),
 						  			 new BMessage(BCHECKBOX_TOGGLED));
@@ -150,22 +163,30 @@ MainView::MainView (BRect frame)
 	ĉKey->GetPreferredSize(&glyphSize);
 	BSize preferredSize(glyphSize.Width(), glyphSize.Height());
 	
+	printf ("Preferred size: %.2f, %.2f.\n", glyphSize.Width(), glyphSize.Height());
+	
 	BGridLayout* layout = dynamic_cast <BGridLayout*>(directBox->ChildAt(1)->GetLayout());
 	if (layout) {
-		for (int32 col = 1; col < layout->CountColumns(); ++col)
+		for (int32 col = 1; col < layout->CountColumns()-1; col++)
 		{
 			layout->ItemAt(col, 2)->SetExplicitAlignment(
-							BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+							BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
+			layout->ItemAt(col, 0)->SetExplicitAlignment(
+							BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));	
 			layout->ItemAt(col, 1)->SetExplicitAlignment(
-							BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
-//			layout->ItemAt(col, 0)->SetExplicitMinSize(preferredSize);
-//			layout->ItemAt(col, 0)->SetExplicitMaxSize(preferredSize);
-//			layout->ItemAt(col, 0)->SetExplicitPreferredSize(preferredSize);
+							BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
+			layout->ItemAt(col, 0)->SetExplicitMinSize(preferredSize);
+			layout->ItemAt(col, 0)->SetExplicitMaxSize(preferredSize);
+			layout->ItemAt(col, 0)->SetExplicitPreferredSize(preferredSize);
 			layout->SetMaxColumnWidth(col, glyphSize.Width());
-			if (col != 0)
+			if (col != 0) {
 				layout->SetColumnWeight(col, 0);
+			}
 		}
-//		layout->SetColumnWeight(0, 0);
+		layout->SetColumnWeight(0, 0);
+		layout->SetMaxColumnWidth(0, substituteKeysLabelFrame.Width());
+		layout->SetMinColumnWidth(0, substituteKeysLabelFrame.Width());
+			
 		layout->SetMaxRowHeight(0, glyphSize.Height());
 		layout->SetMaxRowHeight(1, glyphSize.Height());
 		layout->SetMaxRowHeight(2, glyphSize.Height());
