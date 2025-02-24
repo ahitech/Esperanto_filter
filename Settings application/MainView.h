@@ -39,6 +39,8 @@ protected:
 	
 	bool bUseDirectKeys;
 	bool bStartupWithTheSystem;
+	
+	void SaveSettings();
 };
 
 

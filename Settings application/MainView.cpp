@@ -28,6 +28,7 @@ const uint32	AUTO_U_AFTER_A_E		= 'AuAE';
 const uint32	NEXT_POSTFIX_REMOVES_ACCENT	= 'NPRA';
 const uint32	NEXT_PREFIX_REMOVES_ACCENT	= 'NpRA';
 const uint32	INSTALL_IN_DESKBAR		= 'Dskb';
+const uint32	NEXT_SAME_LETTER_REMOVES_ACCENT = 'NsRA';
 
 MainView::MainView (BRect frame)
 	: BView (frame, "main View",
@@ -59,17 +60,22 @@ MainView::MainView (BRect frame)
 		new BMessage(NEXT_POSTFIX_REMOVES_ACCENT));
 		
 	BCheckBox* nextPrefix = new BCheckBox("nextPrefix",
-		B_TRANSLATE("Next prefix symbol removes accent"),
+		B_TRANSLATE("Double typing the same prefix symbol prevents accent"),
 		new BMessage(NEXT_PREFIX_REMOVES_ACCENT));
+		
+	BCheckBox* nextSameLetter = new BCheckBox("nextSameLetter",
+		B_TRANSLATE("Typing the same letter again removes accent"),
+		new BMessage(NEXT_SAME_LETTER_REMOVES_ACCENT));
 	
 	BBox* textManipulation = new BBox(B_FANCY_BORDER,
 				BLayoutBuilder::Group<>(B_VERTICAL, 1.0f)
 					.SetInsets(10.0f, 4.0f, 5.0f, 4.0f)
+					.Add(autoŬ)
 					.Add(postfixSymbols)
 					.Add(nextPostfix)
 					.Add(prefixSymbols)
 					.Add(nextPrefix)
-					.Add(autoŬ)
+					.Add(nextSameLetter)
 					.View());
 	BStringView* textManipulationLabel = new BStringView("text manipulation label",
 					B_TRANSLATE("Notation"));
@@ -163,8 +169,6 @@ MainView::MainView (BRect frame)
 	ĉKey->GetPreferredSize(&glyphSize);
 	BSize preferredSize(glyphSize.Width(), glyphSize.Height());
 	
-	printf ("Preferred size: %.2f, %.2f.\n", glyphSize.Width(), glyphSize.Height());
-	
 	BGridLayout* layout = dynamic_cast <BGridLayout*>(directBox->ChildAt(1)->GetLayout());
 	if (layout) {
 		for (int32 col = 1; col < layout->CountColumns()-1; col++)
@@ -193,7 +197,7 @@ MainView::MainView (BRect frame)
 		layout->InvalidateLayout();
 	}
 
-	FILE* log = fopen("/boot/home/log.txt", "w");
+//	FILE* log = fopen("/boot/home/log.txt", "w");
 	BRect layoutItemRect;
 	layout = dynamic_cast <BGridLayout*>(directBox->ChildAt(1)->GetLayout());
 	if (layout) {
@@ -203,14 +207,14 @@ MainView::MainView (BRect frame)
 			{
 				layoutItem = layout->ItemAt(col, row);
 				layoutItemRect = layoutItem->Frame();
-				
-				fprintf(log, "Item at row %d, col %d has width of %.2f.\n",
-						row, col, layoutItemRect.Width());
+//				
+//				fprintf(log, "Item at row %d, col %d has width of %.2f.\n",
+//						row, col, layoutItemRect.Width());
 			}
 		}
 	}
 	
-	fclose(log);
+//	fclose(log);
 	
 
 	
@@ -327,3 +331,12 @@ void MainView::AttachedToWindow()
    BView::AttachedToWindow();
 }
 
+
+void MainView::SaveSettings(void)
+{
+	BMessage* settingsMessage = new BMessage('EFSt');
+// TODO: Instead of hardcoded path, use function to determine
+//		 the correct location of the Settings file
+//	BFile* settingsFile = new BFile("/boot/home/config/"
+	
+}

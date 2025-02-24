@@ -8,7 +8,7 @@
 #include "Application.h"
 
 AppWindow::AppWindow () :
-	BWindow (BRect (100, 100, 500, 600),
+	BWindow (BRect (100, 100, 500, 700),
 			 "Esperanto Filter",
 			 B_TITLED_WINDOW,
 			 B_ASYNCHRONOUS_CONTROLS)
